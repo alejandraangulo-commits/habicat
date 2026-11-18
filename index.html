@@ -3,43 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HábiCat | Un hábitat para tu gato</title>
-    <!-- Tailwind CSS vía CDN -->
+    <title>HábiCat | Diseño y Personalización de Hábitats Felinos</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <!-- Google Fonts: Inter y Playfair Display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome para iconos limpios -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        serif: ['Outfit', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
                     },
                     colors: {
                         sand: {
                             50: '#FAF8F5',
-                            100: '#F4EFE6',
-                            200: '#E6DEC8',
-                            300: '#D4C5A9',
-                            800: '#4A4238',
-                            900: '#2E2922',
+                            100: '#F3EFEA',
+                            200: '#E5DDD0',
+                            800: '#4A3F35',
+                            900: '#2B241F',
                         },
                         sage: {
-                            50: '#F2F5F3',
-                            100: '#E1E8E3',
-                            500: '#6B8E78',
-                            600: '#53735F',
-                            700: '#3E5747',
-                        },
-                        terracotta: {
-                            500: '#C87D65',
-                            600: '#B0654E',
+                            50: '#F4F7F4',
+                            100: '#E3EAE3',
+                            500: '#6B8E70',
+                            600: '#55755A',
+                            700: '#425C46',
                         }
                     }
                 }
@@ -47,1305 +41,951 @@
         }
     </script>
     <style>
-        /* Transiciones suaves para el simulador de pared y módulos */
-        #wall-canvas {
-            transition: background-color 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        body {
+            background-color: #FAF8F5;
+            color: #2B241F;
         }
-        .module-group {
-            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-origin: center;
-        }
-        .module-hidden {
-            opacity: 0;
-            transform: scale(0.92) translateY(8px);
+        /* Marca de agua fija con el logo de HábiCat en el fondo al hacer scroll */
+        .bg-watermark-logo {
+            position: fixed;
+            inset: 0;
+            background-image: url('assets/logo.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: min(65vw, 560px);
+            opacity: 0.055;
             pointer-events: none;
+            z-index: 0;
         }
-        .module-visible {
-            opacity: 1;
-            transform: scale(1) translateY(0);
+        /* Estilización personalizada para inputs de color y barras */
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 9999px;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
         }
-        .wood-fill {
-            transition: fill 0.35s ease, stroke 0.35s ease;
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
         }
-        /* Estilo sutil de barra de desplazamiento */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #FAF8F5;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #D4C5A9;
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid #E5DDD0;
             border-radius: 9999px;
         }
+        .wall-transition {
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .module-fade {
+            animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.92) translateY(6px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
     </style>
-</head>
-<body class="bg-sand-50 text-sand-900 font-sans antialiased selection:bg-sage-500 selection:text-white">
+    <script>
+        // Manejador global definido antes del renderizado del body para evitar ReferenceError en onerror
+        window.handleMissingPhoto = function(imgEl, expectedPath) {
+            if (!imgEl || imgEl.dataset.fallbackApplied) return;
+            imgEl.dataset.fallbackApplied = 'true';
+            imgEl.onerror = null;
 
-    <!-- ==================== NAVEGACIÓN PRINCIPAL ==================== -->
-    <header class="sticky top-0 z-40 bg-sand-50/90 backdrop-blur-md border-b border-sand-200/70">
-            <!-- Logo HábiCat con soporte para assets/logo.png y fallback vectorial -->
-            <a href="#inicio" class="flex items-center gap-3 group">
-                <img src="assets/logo.png" alt="Logo HábiCat" class="h-11 w-auto object-contain rounded-xl" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="w-11 h-11 rounded-2xl bg-sage-600 text-white hidden items-center justify-center shadow-sm group-hover:bg-sage-700 transition">
-                    <svg class="w-7 h-7" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 14L7 6L14 10C16.5 9.3 19.5 9.3 22 10L29 6L27 14C28.5 16.2 29 19 28.5 22C27.5 27.5 23 30 18 30C13 30 8.5 27.5 7.5 22C7 19 7.5 16.2 9 14Z"/>
-                        <circle cx="14" cy="18" r="1.2" fill="currentColor"/>
-                        <circle cx="22" cy="18" r="1.2" fill="currentColor"/>
-                        <path d="M16.5 21.5L18 23L19.5 21.5"/>
-                    </svg>
+            const container = imgEl.parentElement;
+            if (container) {
+                imgEl.style.display = 'none';
+                const fallbackDiv = document.createElement('div');
+                fallbackDiv.className = 'w-full h-full flex flex-col items-center justify-center p-4 text-center bg-sand-100 text-sand-800';
+                fallbackDiv.innerHTML = `
+                    <div class="w-10 h-10 rounded-xl bg-sage-100 text-sage-700 flex items-center justify-center mb-2">
+                        <i class="fa-regular fa-image"></i>
+                    </div>
+                    <p class="text-xs font-semibold text-sand-900">Vista previa de maqueta</p>
+                    <p class="text-[11px] text-sand-800/70 mt-1">Ruta vinculada: <code class="bg-sand-200/70 px-1.5 py-0.5 rounded">${expectedPath}</code></p>
+                `;
+                container.appendChild(fallbackDiv);
+            }
+        };
+    </script>
+</head>
+<body class="font-sans antialiased selection:bg-sage-500 selection:text-white relative">
+
+    <!-- Marca de agua fija con el logo sin fondo durante todo el desplazamiento -->
+    <div class="bg-watermark-logo" aria-hidden="true"></div>
+
+    <!-- Barra de Navegación Superior -->
+    <header class="sticky top-0 z-40 bg-sand-50/90 backdrop-blur-md border-b border-sand-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-sage-600 text-white flex items-center justify-center shadow-sm group-hover:bg-sage-700 transition">
+                    <i class="fa-solid fa-cat text-lg"></i>
                 </div>
                 <div>
-                    <span class="font-serif text-2xl font-bold tracking-tight text-sand-900 block leading-none">HábiCat</span>
-                    <span class="text-[11px] uppercase tracking-widest text-sage-700 font-semibold">Un hábitat para tu gato</span>
+                    <span class="font-serif text-xl font-bold tracking-tight text-sand-900">HábiCat</span>
+                    <span class="hidden sm:inline-block text-xs text-sage-700 font-medium ml-2 bg-sage-100 px-2 py-0.5 rounded-full">Un hábitat para tu gato</span>
                 </div>
             </a>
 
-            <!-- Menú Desktop -->
             <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-sand-800">
-                <a href="#inicio" class="hover:text-sage-600 transition">Inicio</a>
-                <a href="#personalizador" class="hover:text-sage-600 transition">Personalizador Visual</a>
-                <a href="#prototipo" class="hover:text-sage-600 transition">Prototipo Real</a>
+                <a href="#personalizador" class="hover:text-sage-600 transition">Personalizar Hábitat</a>
+                <a href="#planes" class="hover:text-sage-600 transition">Niveles</a>
+                <a href="#prototipo" class="hover:text-sage-600 transition">Prototipo a Escala</a>
                 <a href="#contacto" class="hover:text-sage-600 transition">Contacto</a>
             </nav>
 
-            <!-- Botón CTA Header -->
             <div class="flex items-center gap-3">
-                <a href="#personalizador" class="bg-sage-600 hover:bg-sage-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
-                    <span>Diseñar mi HábiCat</span>
+                <a href="https://instagram.com/habicat" target="_blank" rel="noopener noreferrer" class="text-sand-800 hover:text-sage-600 p-2 rounded-full hover:bg-sand-100 transition" title="Síguenos en Instagram @habicat">
+                    <i class="fa-brands fa-instagram text-xl"></i>
+                </a>
+                <a href="#personalizador" class="bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition">
+                    Diseñar el mío
                 </a>
             </div>
         </div>
-        <!-- Navegación móvil rápida -->
-        <div class="md:hidden flex justify-around border-t border-sand-200/60 py-2 text-xs font-medium text-sand-800 bg-sand-50">
-            <a href="#inicio" class="px-2 py-1">Inicio</a>
-            <a href="#personalizador" class="px-2 py-1 text-sage-700 font-semibold">Personalizador</a>
-            <a href="#prototipo" class="px-2 py-1">Prototipo</a>
-            <a href="#contacto" class="px-2 py-1">Contacto</a>
-        </div>
     </header>
 
-    <!-- ==================== HERO SECTION ==================== -->
-    <section id="inicio" class="relative overflow-hidden py-14 lg:py-24 border-b border-sand-200/60">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                <!-- Columna de Texto y Logo Oficial de Bienvenida -->
-                <div class="lg:col-span-7 space-y-6">
-                    <!-- Logo Oficial del Emprendimiento en la Bienvenida -->
-                    <div class="inline-block bg-white/90 backdrop-blur-sm p-4 sm:p-5 rounded-3xl border border-sand-200/90 shadow-sm">
-                        <img src="assets/logo.png" alt="Logo HábiCat - Un hábitat para tu gato" class="max-h-24 sm:max-h-28 w-auto object-contain" onerror="this.style.display='none'; document.getElementById('hero-logo-fallback').classList.remove('hidden');">
-                        <div id="hero-logo-fallback" class="hidden flex items-center gap-3.5 px-2 py-1">
-                            <div class="w-12 h-12 rounded-2xl bg-sage-600 text-white flex items-center justify-center">
-                                <i class="fa-solid fa-cat text-2xl"></i>
-                            </div>
-                            <div>
-                                <p class="font-serif text-2xl font-bold text-sand-900 leading-none">HábiCat</p>
-                                <p class="text-xs text-sage-700 font-medium mt-1">Archivo esperado: <code class="bg-sand-100 px-1.5 py-0.5 rounded">assets/logo.png</code></p>
-                            </div>
+    <!-- Sección Hero / Bienvenida -->
+    <section class="relative overflow-hidden pt-10 pb-14 sm:pt-14 sm:pb-20 border-b border-sand-200/70 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <!-- Contenedor del Logo Oficial de HábiCat -->
+            <div class="flex justify-center mb-6">
+                <div class="bg-white/95 backdrop-blur-sm border border-sand-200/90 rounded-3xl px-8 py-5 shadow-sm inline-flex flex-col items-center justify-center max-w-md w-full">
+                    <img id="brandLogoImg" src="assets/logo.png" alt="Logo Oficial HábiCat - Un hábitat para tu gato" class="max-h-28 sm:max-h-32 w-auto object-contain" onerror="handleMissingLogo(this)">
+                    <div id="brandLogoFallback" class="hidden flex-col items-center py-2">
+                        <div class="flex items-center gap-3 text-sand-900">
+                            <i class="fa-solid fa-cat text-3xl text-sage-600"></i>
+                            <span class="font-serif text-4xl font-bold tracking-tight">HábiCat</span>
                         </div>
-                    </div>
-
-                    <div class="block">
-                        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sage-100 text-sage-700 text-xs font-semibold tracking-wide">
-                            <i class="fa-solid fa-paw"></i>
-                            <span>Diseño Interior & Enriquecimiento Ambiental Felino</span>
-                        </span>
-                    </div>
-
-                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-sand-900 leading-tight">
-                        HábiCat — <span class="text-sage-600">Un hábitat para tu gato</span>
-                    </h1>
-                    <p class="text-lg sm:text-xl text-sand-800/90 leading-relaxed max-w-2xl">
-                        Diseño, fabricación e instalación "llave en mano" de gimnasios aéreos personalizados en madera melamínica de alta resistencia. Transforma tus paredes sin sacrificar la estética de tu hogar.
-                    </p>
-                    
-                    <!-- Beneficios clave rápidos -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                        <div class="bg-white p-4 rounded-2xl border border-sand-200/80 shadow-sm">
-                            <div class="w-8 h-8 rounded-lg bg-sage-100 text-sage-700 flex items-center justify-center mb-2">
-                                <i class="fa-solid fa-ruler-combined"></i>
-                            </div>
-                            <h3 class="font-semibold text-sm text-sand-900">100% a Medida</h3>
-                            <p class="text-xs text-sand-800/75 mt-1">Adaptado a las paredes y estilo de tu apartamento.</p>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-sand-200/80 shadow-sm">
-                            <div class="w-8 h-8 rounded-lg bg-sage-100 text-sage-700 flex items-center justify-center mb-2">
-                                <i class="fa-solid fa-shield-cat"></i>
-                            </div>
-                            <h3 class="font-semibold text-sm text-sand-900">Melamina Segura</h3>
-                            <p class="text-xs text-sand-800/75 mt-1">Alta resistencia, fácil limpieza y anclajes ocultos.</p>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-sand-200/80 shadow-sm">
-                            <div class="w-8 h-8 rounded-lg bg-sage-100 text-sage-700 flex items-center justify-center mb-2">
-                                <i class="fa-solid fa-screwdriver-wrench"></i>
-                            </div>
-                            <h3 class="font-semibold text-sm text-sand-900">Llave en Mano</h3>
-                            <p class="text-xs text-sand-800/75 mt-1">Asesoría etológica, fabricación e instalación limpia.</p>
-                        </div>
-                    </div>
-
-                    <div class="pt-4 flex flex-wrap items-center gap-4">
-                        <a href="#personalizador" class="bg-sage-600 hover:bg-sage-700 text-white font-semibold px-7 py-4 rounded-2xl shadow-md hover:shadow-lg transition flex items-center gap-3 text-base">
-                            <span>Personalizar mi HábiCat ahora</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-                        <a href="#prototipo" class="bg-white hover:bg-sand-100 text-sand-900 border border-sand-300 font-medium px-6 py-4 rounded-2xl transition flex items-center gap-2 text-base">
-                            <i class="fa-regular fa-circle-play text-sage-600"></i>
-                            <span>Ver prototipo real</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Columna Visual Decorativa -->
-                <div class="lg:col-span-5">
-                    <div class="relative bg-sand-100 rounded-3xl p-6 sm:p-8 border border-sand-200 shadow-inner">
-                        <div class="aspect-[4/3] rounded-2xl bg-[#E1E8E3] relative overflow-hidden flex flex-col justify-between p-6 border border-sage-500/20">
-                            <div class="flex justify-between items-start">
-                                <span class="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-sage-700 shadow-sm">
-                                    Vista previa interactiva
-                                </span>
-                                <span class="text-xs font-medium text-sand-800 bg-white/80 px-2.5 py-1 rounded-lg">
-                                    Melamina Roble + Sisal
-                                </span>
-                            </div>
-                            
-                            <!-- Ilustración conceptual limpia -->
-                            <svg viewBox="0 0 320 180" class="w-full h-auto my-auto drop-shadow-sm">
-                                <!-- Repisas -->
-                                <rect x="30" y="125" width="65" height="12" rx="4" fill="#C9A27E"/>
-                                <rect x="115" y="95" width="75" height="12" rx="4" fill="#C9A27E"/>
-                                <!-- Casa cubo -->
-                                <rect x="210" y="45" width="75" height="65" rx="10" fill="#B58963"/>
-                                <circle cx="247" cy="78" r="20" fill="#4A4238"/>
-                                <!-- Silueta de gato descansando -->
-                                <path d="M135 95 C135 80, 155 80, 160 88 L163 80 L167 87 C172 87, 174 92, 172 95 Z" fill="#2E2922"/>
-                                <path d="M135 92 Q122 88 125 78" stroke="#2E2922" stroke-width="3" fill="none" stroke-linecap="round"/>
-                            </svg>
-
-                            <div class="bg-white/95 backdrop-blur rounded-xl p-3.5 flex items-center justify-between shadow-sm">
-                                <div>
-                                    <p class="text-xs text-sand-800/70">Adiós sofás rasguñados</p>
-                                    <p class="text-sm font-semibold text-sand-900">Estimulación vertical diaria</p>
-                                </div>
-                                <span class="w-9 h-9 rounded-full bg-sage-600 text-white flex items-center justify-center">
-                                    <i class="fa-solid fa-check"></i>
-                                </span>
-                            </div>
-                        </div>
+                        <span class="text-xs text-sand-800/70 mt-1">Un hábitat para tu gato</span>
                     </div>
                 </div>
             </div>
+
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sage-100/80 text-sage-700 text-xs font-semibold mb-5">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>Diseño de Interiores Pet-Friendly • Melamina de Alta Resistencia</span>
+            </div>
+
+            <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-sand-900 tracking-tight max-w-4xl mx-auto leading-tight">
+                Tu sala merece verse impecable; tu gato merece <span class="text-sage-600 italic">explorar las alturas.</span>
+            </h1>
+
+            <p class="mt-5 text-base sm:text-lg text-sand-800/80 max-w-2xl mx-auto leading-relaxed">
+                Diseñamos, fabricamos e instalamos circuitos aéreos a medida en madera melamínica. Configura tu plan, elige los colores de tu pared y tablero, y explora nuestro <strong>prototipo a escala</strong>.
+            </p>
         </div>
     </section>
 
-    <!-- ==================== PERSONALIZADOR INTERACTIVO DE HÁBICAT ==================== -->
-    <section id="personalizador" class="py-16 lg:py-24">
+    <!-- Sección Principal: Configurador Interactivo en Tiempo Real -->
+    <section id="personalizador" class="relative z-10 py-12 sm:py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Encabezado de sección -->
-            <div class="text-center max-w-3xl mx-auto mb-12">
-                <span class="text-xs font-bold uppercase tracking-widest text-sage-600">Simulador Interactivo en Tiempo Real</span>
-                <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-sand-900 mt-2">Configura tu HábiCat Ideal</h2>
-                <p class="text-sand-800/80 mt-3 text-base">
-                    Elige el nivel de circuito, añade accesorios especiales y prueba cómo combinará el tono de la melamina con el color de la pared de tu hogar.
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-sage-600">Paso a paso interactivo</span>
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-sand-900 mt-1">Configura tu HábiCat a medida</h2>
+                </div>
+                <p class="text-sm text-sand-800/75 max-w-md">
+                    Selecciona un nivel base, añade módulos extra y prueba cómo luce la melamina sobre el tono real de la pared de tu hogar.
                 </p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
-                <!-- COLUMNA IZQUIERDA: CONTROLES DE PERSONALIZACIÓN (5 columnas) -->
-                <div class="lg:col-span-5 space-y-6">
+                <!-- Columna Izquierda: Controles de Personalización (5 columnas) -->
+                <div class="lg:col-span-5 space-y-6 bg-white/95 backdrop-blur-sm p-6 sm:p-7 rounded-3xl border border-sand-200 shadow-sm">
                     
-                    <!-- PASO 1: SELECCIÓN DE PLAN / NIVEL -->
-                    <div class="bg-white p-6 rounded-3xl border border-sand-200 shadow-sm">
-                        <div class="flex items-center gap-2.5 mb-4">
-                            <span class="w-7 h-7 rounded-full bg-sage-600 text-white text-xs font-bold flex items-center justify-center">1</span>
-                            <h3 class="font-semibold text-lg text-sand-900">Elige tu Nivel HábiCat</h3>
-                        </div>
-                        
-                        <div class="space-y-3" id="plan-selector">
-                            <!-- Plan Sencillo -->
-                            <label class="plan-card block cursor-pointer rounded-2xl border-2 border-sand-200 p-4 transition hover:border-sage-500 bg-sand-50/50" data-plan="sencillo">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <input type="radio" name="habicat_plan" value="sencillo" class="w-4 h-4 text-sage-600 focus:ring-sage-500">
-                                        <div>
-                                            <span class="font-bold text-sand-900 block">HábiCat Sencillo</span>
-                                            <span class="text-xs text-sage-700 font-medium">Ideal para espacios compactos</span>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold bg-sand-200/80 text-sand-900 px-2.5 py-1 rounded-lg">$380.000 COP</span>
+                    <!-- 1. Selección de Plan / Nivel -->
+                    <div id="planes">
+                        <label class="block text-sm font-bold text-sand-900 mb-3 flex items-center justify-between">
+                            <span>1. Elige el nivel de tu HábiCat</span>
+                            <span class="text-xs font-normal text-sage-700 bg-sage-100 px-2.5 py-0.5 rounded-full">Incluye instalación</span>
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="planSelector">
+                            <button type="button" data-plan="sencillo" class="plan-btn text-left p-3.5 rounded-2xl border-2 border-sage-600 bg-sage-50/70 transition cursor-pointer">
+                                <div class="font-bold text-sm text-sand-900">HábiCat Sencillo</div>
+                                <div class="text-xs text-sand-800/75 mt-0.5">3 módulos base</div>
+                                <div class="text-xs font-bold text-sage-700 mt-2">$380.000 COP</div>
+                            </button>
+
+                            <button type="button" data-plan="intermedio" class="plan-btn text-left p-3.5 rounded-2xl border-2 border-sand-200 hover:border-sage-400 bg-white transition cursor-pointer">
+                                <div class="font-bold text-sm text-sand-900">Nivel Intermedio</div>
+                                <div class="text-xs text-sand-800/75 mt-0.5">5 módulos + puente</div>
+                                <div class="text-xs font-bold text-sage-700 mt-2">$590.000 COP</div>
+                            </button>
+
+                            <button type="button" data-plan="super" class="plan-btn text-left p-3.5 rounded-2xl border-2 border-sand-200 hover:border-sage-400 bg-white transition cursor-pointer">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-sm text-sand-900">Súper HábiCat</span>
                                 </div>
-                                <p class="text-xs text-sand-800/80 mt-2 pl-7">
-                                    Base: 2 repisas escalón + 1 repisa panorámica de descanso.
-                                </p>
-                            </label>
-
-                            <!-- Plan Intermedio -->
-                            <label class="plan-card block cursor-pointer rounded-2xl border-2 border-sage-600 p-4 transition bg-sage-50/60" data-plan="intermedio">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <input type="radio" name="habicat_plan" value="intermedio" checked class="w-4 h-4 text-sage-600 focus:ring-sage-500">
-                                        <div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="font-bold text-sand-900">HábiCat Intermedio</span>
-                                                <span class="text-[10px] uppercase font-bold bg-sage-600 text-white px-2 py-0.5 rounded-full">Más elegido</span>
-                                            </div>
-                                            <span class="text-xs text-sage-700 font-medium">Equilibrio perfecto de altura y juego</span>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold bg-sage-200/80 text-sage-900 px-2.5 py-1 rounded-lg">$550.000 COP</span>
-                                </div>
-                                <p class="text-xs text-sand-800/80 mt-2 pl-7">
-                                    Base: 3 repisas + puente colgante en soga y melamina + rascador vertical.
-                                </p>
-                            </label>
-
-                            <!-- Plan Súper HábiCat -->
-                            <label class="plan-card block cursor-pointer rounded-2xl border-2 border-sand-200 p-4 transition hover:border-sage-500 bg-sand-50/50" data-plan="super">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <input type="radio" name="habicat_plan" value="super" class="w-4 h-4 text-sage-600 focus:ring-sage-500">
-                                        <div>
-                                            <span class="font-bold text-sand-900 block">Súper HábiCat</span>
-                                            <span class="text-xs text-sage-700 font-medium">Circuito aéreo completo de lujo</span>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold bg-terracotta-500/15 text-terracotta-600 px-2.5 py-1 rounded-lg">$820.000 COP</span>
-                                </div>
-                                <p class="text-xs text-sand-800/80 mt-2 pl-7">
-                                    Circuito total: 4 repisas + puente colgante + cubo refugio + hamaca acolchada + rascador.
-                                </p>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- PASO 2: MÓDULOS Y ACCESORIOS ADICIONALES -->
-                    <div class="bg-white p-6 rounded-3xl border border-sand-200 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-7 h-7 rounded-full bg-sage-600 text-white text-xs font-bold flex items-center justify-center">2</span>
-                                <h3 class="font-semibold text-lg text-sand-900">Módulos y Accesorios</h3>
-                            </div>
-                            <span class="text-xs text-sand-800/70">Personaliza tu circuito</span>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="addons-container">
-                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox" data-addon="hamaca" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                    <span class="text-xs font-medium text-sand-900">Hamaca aérea acolchada</span>
-                                </div>
-                                <span class="text-[10px] font-semibold text-sage-700">+$65k</span>
-                            </label>
-
-                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox" data-addon="escaleritas" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                    <span class="text-xs font-medium text-sand-900">Escaleritas (3 peldaños)</span>
-                                </div>
-                                <span class="text-[10px] font-semibold text-sage-700">+$55k</span>
-                            </label>
-
-                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox" data-addon="puente" checked class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                    <span class="text-xs font-medium text-sand-900">Puente colgante soga</span>
-                                </div>
-                                <span class="text-[10px] font-semibold text-sage-700">+$95k</span>
-                            </label>
-
-                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox" data-addon="casa" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                    <span class="text-xs font-medium text-sand-900">Cubo / Refugio mirador</span>
-                                </div>
-                                <span class="text-[10px] font-semibold text-sage-700">+$120k</span>
-                            </label>
-
-                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox" data-addon="rascador" checked class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                    <span class="text-xs font-medium text-sand-900">Rascador vertical sisal</span>
-                                </div>
-                                <span class="text-[10px] font-semibold text-sage-700">+$70k</span>
-                            </label>
-
-                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox" data-addon="comedero" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                    <span class="text-xs font-medium text-sand-900">Repisa panorámica extra</span>
-                                </div>
-                                <span class="text-[10px] font-semibold text-sage-700">+$50k</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- PASO 3: ESTÉTICA (MELAMINA Y COLOR DE PARED) -->
-                    <div class="bg-white p-6 rounded-3xl border border-sand-200 shadow-sm space-y-5">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-7 h-7 rounded-full bg-sage-600 text-white text-xs font-bold flex items-center justify-center">3</span>
-                            <h3 class="font-semibold text-lg text-sand-900">Acabados y Color de tu Pared</h3>
-                        </div>
-
-                        <!-- Selector de Melamina -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="text-xs font-semibold uppercase tracking-wider text-sand-800">Tablero de Melamina</label>
-                                <span id="selected-melamine-label" class="text-xs font-bold text-sage-700">Roble Nórdico</span>
-                            </div>
-                            <div class="grid grid-cols-5 gap-2.5" id="melamine-swatches">
-                                <button type="button" data-name="Roble Nórdico" data-fill="#C9A27E" data-stroke="#A37C58" data-dark="#9B7451" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-sage-600 bg-sand-50">
-                                    <span class="w-9 h-9 rounded-full shadow-inner border border-black/10" style="background: linear-gradient(135deg, #D8B490 0%, #B88E68 100%);"></span>
-                                    <span class="text-[10px] font-medium text-center leading-tight">Roble Nórdico</span>
-                                </button>
-
-                                <button type="button" data-name="Blanco Puro Minimalista" data-fill="#F8FAFC" data-stroke="#CBD5E1" data-dark="#E2E8F0" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
-                                    <span class="w-9 h-9 rounded-full shadow-inner border border-slate-300" style="background: #F8FAFC;"></span>
-                                    <span class="text-[10px] font-medium text-center leading-tight">Blanco Puro</span>
-                                </button>
-
-                                <button type="button" data-name="Nogal Terracota" data-fill="#7A4B3A" data-stroke="#593326" data-dark="#522E22" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
-                                    <span class="w-9 h-9 rounded-full shadow-inner border border-black/10" style="background: linear-gradient(135deg, #8D5A47 0%, #63392A 100%);"></span>
-                                    <span class="text-[10px] font-medium text-center leading-tight">Nogal Oscuro</span>
-                                </button>
-
-                                <button type="button" data-name="Gris Grafito Moderno" data-fill="#475569" data-stroke="#1E293B" data-dark="#334155" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
-                                    <span class="w-9 h-9 rounded-full shadow-inner border border-black/20" style="background: #475569;"></span>
-                                    <span class="text-[10px] font-medium text-center leading-tight">Gris Grafito</span>
-                                </button>
-
-                                <button type="button" data-name="Arena / Beige Cálido" data-fill="#E3D5BE" data-stroke="#BFA988" data-dark="#C9B79C" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
-                                    <span class="w-9 h-9 rounded-full shadow-inner border border-black/10" style="background: #E3D5BE;"></span>
-                                    <span class="text-[10px] font-medium text-center leading-tight">Arena Cálido</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Selector de Color de Pared -->
-                        <div class="pt-2 border-t border-sand-100">
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="text-xs font-semibold uppercase tracking-wider text-sand-800">Color de Pared de tu Hogar</label>
-                                <span id="selected-wall-label" class="text-xs font-bold text-sage-700">Arena Cálido (#F3EAD8)</span>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2.5">
-                                <button type="button" data-wall-name="Blanco Galería" data-color="#F8F9FA" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #F8F9FA;" title="Blanco Galería"></button>
-                                <button type="button" data-wall-name="Gris Piedra Suave" data-color="#E2E8F0" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #E2E8F0;" title="Gris Piedra Suave"></button>
-                                <button type="button" data-wall-name="Verde Salvia Nórdico" data-color="#D8E2DC" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #D8E2DC;" title="Verde Salvia Nórdico"></button>
-                                <button type="button" data-wall-name="Terracota Pastel" data-color="#EAD2AC" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #EAD2AC;" title="Terracota Pastel"></button>
-                                <button type="button" data-wall-name="Azul Pizarra Suave" data-color="#CBD5E1" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #CBD5E1;" title="Azul Pizarra Suave"></button>
-                                <button type="button" data-wall-name="Arena Cálido" data-color="#F3EAD8" class="wall-btn w-8 h-8 rounded-full border-2 border-sage-600 ring-2 ring-sage-500/30 shadow-sm transition transform hover:scale-110" style="background-color: #F3EAD8;" title="Arena Cálido"></button>
-                                
-                                <!-- Selector libre de color -->
-                                <label class="ml-auto flex items-center gap-2 bg-sand-100 hover:bg-sand-200/80 px-3 py-1.5 rounded-xl cursor-pointer transition border border-sand-300/70">
-                                    <i class="fa-solid fa-palette text-sage-700 text-xs"></i>
-                                    <span class="text-xs font-medium text-sand-900">Otro color</span>
-                                    <input type="color" id="custom-wall-picker" value="#F3EAD8" class="w-5 h-5 border-0 bg-transparent cursor-pointer p-0">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- COLUMNA DERECHA: RENDER / SIMULADOR DE PARED EN VIVO + RESUMEN (7 columnas) -->
-                <div class="lg:col-span-7 lg:sticky lg:top-24 space-y-6">
-                    
-                    <!-- Lienzo Interactivo de Pared -->
-                    <div class="bg-white p-4 sm:p-6 rounded-3xl border border-sand-200 shadow-md">
-                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span class="text-xs font-semibold text-sand-800 uppercase tracking-wider">Simulador de Pared en Vivo</span>
-                            </div>
-                            <span id="badge-plan-title" class="text-xs font-bold bg-sage-100 text-sage-700 px-3 py-1 rounded-full">
-                                HábiCat Intermedio • Roble Nórdico
-                            </span>
-                        </div>
-
-                        <!-- PARED SIMULADA -->
-                        <div id="wall-canvas" class="relative w-full aspect-[16/11] rounded-2xl overflow-hidden border border-sand-300/80 shadow-inner flex items-end" style="background-color: #F3EAD8;">
-                            
-                            <!-- Iluminación ambiental sutil -->
-                            <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle at 25% 15%, rgba(255,255,255,0.45) 0%, rgba(0,0,0,0.06) 100%);"></div>
-
-                            <!-- Indicador de medidas referenciales -->
-                            <div class="absolute top-3 left-3 bg-white/85 backdrop-blur-sm px-3 py-1.5 rounded-xl text-[11px] font-medium text-sand-800 shadow-sm border border-black/5">
-                                <i class="fa-solid fa-arrows-left-right text-sage-600 mr-1"></i>
-                                Espacio sugerido: <strong id="wall-dimensions">2.20m ancho x 1.80m alto</strong>
-                            </div>
-
-                            <!-- SVG COMPLETO DE LA HABITACIÓN Y CIRCUITOS DE MELAMINA -->
-                            <svg id="habicat-svg" viewBox="0 0 800 550" class="w-full h-full relative z-10">
-                                <defs>
-                                    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
-                                        <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#1E293B" flood-opacity="0.18"/>
-                                    </filter>
-                                    <pattern id="sisalPattern" width="6" height="6" patternUnits="userSpaceOnUse">
-                                        <rect width="6" height="6" fill="#D6C3A5"/>
-                                        <path d="M0 3H6M3 0V6" stroke="#B89F7A" stroke-width="1"/>
-                                    </pattern>
-                                </defs>
-
-                                <!-- Zócalo / Guardaescoba y Piso de Madera -->
-                                <rect x="0" y="485" width="800" height="12" fill="#E2DDD5"/>
-                                <rect x="0" y="497" width="800" height="53" fill="#D5C7B2"/>
-                                <line x1="0" y1="497" x2="800" y2="497" stroke="#B8A68E" stroke-width="2"/>
-
-                                <!-- Planta Decorativa Izquierda (Escala real del hogar) -->
-                                <g transform="translate(45, 370)">
-                                    <path d="M22 85 L68 85 L60 127 L30 127 Z" fill="#C87D65"/>
-                                    <rect x="19" y="80" width="52" height="8" rx="3" fill="#B0654E"/>
-                                    <path d="M45 80 C35 50, 10 45, 15 20 C28 35, 42 55, 45 80 Z" fill="#6B8E78"/>
-                                    <path d="M45 80 C55 45, 80 40, 75 15 C60 30, 48 55, 45 80 Z" fill="#53735F"/>
-                                    <path d="M45 80 C42 40, 48 20, 45 5 C38 25, 40 55, 45 80 Z" fill="#7DA18A"/>
-                                </g>
-
-                                <!-- Sofá Moderno Minimalista (Referencia de altura en sala) -->
-                                <g transform="translate(175, 385)" opacity="0.92">
-                                    <!-- Patas -->
-                                    <rect x="30" y="102" width="8" height="15" rx="2" fill="#5C4D3C"/>
-                                    <rect x="412" y="102" width="8" height="15" rx="2" fill="#5C4D3C"/>
-                                    <!-- Respaldo -->
-                                    <rect x="25" y="15" width="400" height="55" rx="14" fill="#94A3B8"/>
-                                    <!-- Cojines asiento -->
-                                    <rect x="20" y="58" width="205" height="32" rx="10" fill="#CBD5E1"/>
-                                    <rect x="225" y="58" width="205" height="32" rx="10" fill="#CBD5E1"/>
-                                    <!-- Base y brazos -->
-                                    <rect x="10" y="42" width="24" height="55" rx="10" fill="#64748B"/>
-                                    <rect x="416" y="42" width="24" height="55" rx="10" fill="#64748B"/>
-                                    <rect x="15" y="84" width="420" height="20" rx="6" fill="#64748B"/>
-                                    <!-- Cojín decorativo -->
-                                    <rect x="48" y="32" width="42" height="38" rx="8" fill="#E8C5B8" transform="rotate(-8 48 32)"/>
-                                </g>
-
-                                <!-- ==================== MÓDULOS DE MELAMINA (DINÁMICOS) ==================== -->
-
-                                <!-- BASE 1: REPISAS ESCALÓN IZQUIERDA (Siempre visibles en todos los planes) -->
-                                <g id="mod-repisas-base" class="module-group module-visible" filter="url(#dropShadow)">
-                                    <!-- Repisa 1 (Baja izquierda) -->
-                                    <rect class="wood-fill" x="110" y="310" width="95" height="16" rx="4" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <rect x="122" y="306" width="71" height="4" rx="2" fill="url(#sisalPattern)"/>
-                                    <!-- Repisa 2 (Media izquierda) -->
-                                    <rect class="wood-fill" x="185" y="245" width="100" height="16" rx="4" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <rect x="197" y="241" width="76" height="4" rx="2" fill="url(#sisalPattern)"/>
-                                    <!-- Plataforma superior izquierda (Especial para Sencillo) -->
-                                    <rect class="wood-fill" x="265" y="175" width="135" height="18" rx="5" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <rect x="278" y="169" width="109" height="6" rx="3" fill="#E2E8F0"/>
-                                </g>
-
-                                <!-- REPISAS EXTRA (Nivel Intermedio y Súper) -->
-                                <g id="mod-repisas-extra" class="module-group module-visible" filter="url(#dropShadow)">
-                                    <!-- Repisa escalón derecha baja -->
-                                    <rect class="wood-fill" x="595" y="285" width="95" height="16" rx="4" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <rect x="607" y="281" width="71" height="4" rx="2" fill="url(#sisalPattern)"/>
-                                    <!-- Repisa alta derecha -->
-                                    <rect class="wood-fill" x="530" y="215" width="110" height="16" rx="4" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                </g>
-
-                                <!-- ACCESORIO: POSTE RASCADOR VERTICAL DE SISAL -->
-                                <g id="mod-rascador" class="module-group module-visible" filter="url(#dropShadow)">
-                                    <!-- Base y tope de melamina -->
-                                    <rect class="wood-fill" x="685" y="175" width="44" height="12" rx="3" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <rect class="wood-fill" x="685" y="345" width="44" height="12" rx="3" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <!-- Cilindro de sisal -->
-                                    <rect x="695" y="187" width="24" height="158" fill="url(#sisalPattern)" stroke="#B89F7A" stroke-width="1.5"/>
-                                </g>
-
-                                <!-- ACCESORIO: PUENTE COLGANTE DE MADERA Y CUERDA -->
-                                <g id="mod-puente" class="module-group module-visible" filter="url(#dropShadow)">
-                                    <!-- Cuerdas tensoras superiores -->
-                                    <path d="M395 178 Q465 205 535 218" stroke="#A89378" stroke-width="2.5" fill="none"/>
-                                    <path d="M395 155 Q465 180 535 195" stroke="#A89378" stroke-width="2" fill="none"/>
-                                    <!-- Postes laterales del puente -->
-                                    <rect class="wood-fill" x="390" y="150" width="10" height="35" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
-                                    <rect class="wood-fill" x="530" y="190" width="10" height="35" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
-                                    <!-- Peldaños del puente colgante -->
-                                    <rect class="wood-fill" x="406" y="178" width="18" height="9" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
-                                    <rect class="wood-fill" x="430" y="186" width="18" height="9" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
-                                    <rect class="wood-fill" x="454" y="192" width="18" height="9" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
-                        <!-- RESUMEN DE CONFIGURACIÓN, PRECIO EN COP Y BOTÓN COTIZAR -->
-                        <div class="mt-5 pt-5 border-t border-sand-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div class="space-y-1">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="text-xs font-semibold uppercase tracking-wider text-sage-700">Inversión Estimada Llave en Mano:</span>
-                                    <span id="summary-price" class="text-lg font-extrabold text-sand-900 bg-sage-100 px-2.5 py-0.5 rounded-lg">$550.000 COP</span>
-                                </div>
-                                <p id="summary-payment-scheme" class="text-[11px] font-medium text-sage-700">
-                                    Esquema flexible: 50% anticipo ($275.000) • 50% contra entrega instalada ($275.000)
-                                </p>
-                                <p id="summary-details" class="text-xs text-sand-800/80 leading-relaxed max-w-md pt-1">
-                                    Incluye: 3 repisas escalón, puente colgante soga y rascador vertical sisal. Melamina Roble Nórdico.
-                                </p>
-                            </div>
-                            <button type="button" id="open-quote-modal" class="shrink-0 bg-sage-600 hover:bg-sage-700 text-white font-semibold px-6 py-3.5 rounded-2xl shadow-sm hover:shadow transition flex items-center justify-center gap-2 text-sm">
-                                <i class="fa-brands fa-whatsapp text-lg"></i>
-                                <span>Solicitar Cotización</span>
+                                <div class="text-xs text-sand-800/75 mt-0.5">Circuito completo</div>
+                                <div class="text-xs font-bold text-sage-700 mt-2">$850.000 COP</div>
                             </button>
                         </div>
                     </div>
 
+                    <hr class="border-sand-200/80">
+
+                    <!-- 2. Módulos Personalizables -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-sm font-bold text-sand-900">2. Personaliza tus módulos</label>
+                            <span class="text-xs text-sand-800/70">Activa o desactiva piezas</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="modulesChecklist">
+                            <!-- Generado dinámicamente por JS -->
+                        </div>
+                    </div>
+
+                    <hr class="border-sand-200/80">
+
+                    <!-- 3. Color del Tablero de Melamina -->
+                    <div>
+                        <label class="block text-sm font-bold text-sand-900 mb-2.5">
+                            3. Acabado del tablero de melamina: <span id="melamineLabel" class="font-semibold text-sage-700">Roble Natural</span>
+                        </label>
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2.5" id="melamineSwatches">
+                            <!-- Generado por JS -->
+                        </div>
+                    </div>
+
+                    <hr class="border-sand-200/80">
+
+                    <!-- 4. Color de la Pared de Fondo -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2.5">
+                            <label class="text-sm font-bold text-sand-900">
+                                4. Color de tu pared: <span id="wallLabel" class="font-semibold text-sage-700">Verde Oliva Maqueta</span>
+                            </label>
+                            <div class="flex items-center gap-1.5" title="Elegir cualquier color personalizado">
+                                <span class="text-xs text-sand-800/70">Libre:</span>
+                                <input type="color" id="customWallPicker" value="#87B858" aria-label="Color personalizado de pared">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2.5" id="wallSwatches">
+                            <!-- Generado por JS -->
+                        </div>
+                    </div>
+
                 </div>
+
+                <!-- Columna Derecha: Simulador Visual en la Pared (7 columnas) -->
+                <div class="lg:col-span-7 space-y-5 lg:sticky lg:top-20">
+                    <div class="bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-3xl border border-sand-200 shadow-sm">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-sage-600 animate-pulse"></span>
+                                <h3 class="font-bold text-sm sm:text-base text-sand-900">Vista Previa en tu Pared</h3>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-sand-800/75 bg-sand-100 px-3 py-1 rounded-full">
+                                <i class="fa-solid fa-ruler-combined text-sage-600"></i>
+                                <span id="spaceRecommendation">Espacio sugerido: Pared de 2.2m x 2.4m</span>
+                            </div>
+                        </div>
+
+                        <!-- Lienzo Interactivo de la Sala y Pared -->
+                        <div id="roomPreviewCanvas" class="wall-transition relative w-full rounded-2xl overflow-hidden border border-sand-200 shadow-inner" style="background-color: #87B858; min-height: 410px;">
+                            <!-- Iluminación ambiental superior sutil -->
+                            <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle at 50% 15%, rgba(255,255,255,0.28) 0%, rgba(0,0,0,0.08) 100%);"></div>
+
+                            <!-- SVG Arquitectónico Dinámico del Circuito HábiCat -->
+                            <svg id="habicatSvg" viewBox="0 0 800 470" class="w-full h-auto block relative z-10" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <filter id="dropShadow" x="-15%" y="-15%" width="130%" height="140%">
+                                        <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#1E1815" flood-opacity="0.22"/>
+                                    </filter>
+                                    <pattern id="sisalPattern" width="6" height="6" patternUnits="userSpaceOnUse">
+                                        <path d="M 0 3 L 6 3" stroke="#B69567" stroke-width="2"/>
+                                        <path d="M 0 6 L 6 6" stroke="#9C7C50" stroke-width="1.5"/>
+                                    </pattern>
+                                </defs>
+
+                                <!-- Zócalo y piso de sala moderna -->
+                                <rect x="0" y="405" width="800" height="14" fill="#FFFFFF" opacity="0.88"/>
+                                <rect x="0" y="419" width="800" height="51" fill="#E6DFD5"/>
+                                <line x1="0" y1="419" x2="800" y2="419" stroke="#C8BEB0" stroke-width="1.5"/>
+
+                                <!-- Silueta minimalista de sofá moderno (referencia de escala real 2.40m) -->
+                                <g opacity="0.92">
+                                    <rect x="490" y="340" width="230" height="58" rx="14" fill="#7FA5C9"/>
+                                    <rect x="480" y="362" width="24" height="42" rx="8" fill="#6D93B8"/>
+                                    <rect x="706" y="362" width="24" height="42" rx="8" fill="#6D93B8"/>
+                                    <rect x="504" y="374" width="100" height="26" rx="6" fill="#92B6D9"/>
+                                    <rect x="606" y="374" width="100" height="26" rx="6" fill="#92B6D9"/>
+                                    <rect x="502" y="404" width="8" height="15" rx="2" fill="#7D5C43"/>
+                                    <rect x="700" y="404" width="8" height="15" rx="2" fill="#7D5C43"/>
+                                    <text x="605" y="445" font-family="Inter, sans-serif" font-size="11" fill="#5A4F46" text-anchor="middle" font-weight="500">Referencia de escala: Sofá de 2 cuerpos</text>
+                                </g>
+
+                                <!-- Capa dinámica donde JavaScript renderiza cada módulo elegido -->
+                                <g id="modulesLayer" filter="url(#dropShadow)"></g>
+                            </svg>
+
+                            <!-- Etiqueta flotante de estado -->
+                            <div class="absolute top-3 left-3 z-20 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-sand-200/80 shadow-sm flex items-center gap-2">
+                                <span id="melamineBadgeDot" class="w-3.5 h-3.5 rounded-full border border-black/15" style="background-color: #C89D6C;"></span>
+                                <span class="text-xs font-semibold text-sand-900" id="activeConfigTitle">HábiCat Sencillo • Roble Natural</span>
+                            </div>
+                        </div>
+
+                        <!-- Resumen de Inversión y Acción Directa -->
+                        <div class="mt-5 p-4 sm:p-5 rounded-2xl bg-sand-100/80 border border-sand-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <div class="text-xs font-medium text-sand-800/75">Inversión estimada (Diseño + Fabricación + Instalación):</div>
+                                <div class="flex items-baseline gap-2 mt-0.5">
+                                    <span id="totalPriceDisplay" class="text-2xl sm:text-3xl font-extrabold text-sand-900">$380.000</span>
+                                    <span class="text-xs font-semibold text-sage-700">COP • 50% anticipo / 50% entrega</span>
+                                </div>
+                                <p id="selectedSummaryText" class="text-xs text-sand-800/80 mt-1">
+                                    Incluye: Escalera de pino, cama hexagonal acolchada y repisa flotante.
+                                </p>
+                            </div>
+                            <button type="button" onclick="openQuoteModal()" class="w-full sm:w-auto shrink-0 bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm px-5 py-3.5 rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-brands fa-whatsapp text-lg"></i>
+                                <span>Solicitar este diseño</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- ==================== GALERÍA FIJA DEL PROTOTIPO REAL (CARPETA assets/) ==================== -->
-    <section id="prototipo" class="py-16 lg:py-24 bg-sand-100/70 border-y border-sand-200/80">
+    <!-- Sección: Video y Galería del Prototipo a Escala -->
+    <section id="prototipo" class="relative z-10 py-14 sm:py-20 bg-sand-100/85 border-t border-sand-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-                <div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-sage-600">Validación Técnica y Etológica Real</span>
-                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-sand-900 mt-2">Nuestro Prototipo Real en Melamina</h2>
-                    <p class="text-sand-800/80 mt-2 max-w-2xl text-sm sm:text-base">
-                        Evidencia física de nuestro prototipo instalado: pruebas de resistencia en pared, acabados seguros en melamina y validación de uso real con gatos.
-                    </p>
-                </div>
-
-                <!-- Botón opcional para probar archivos locales adicionales en vivo -->
-                <div>
-                    <label for="prototype-upload" class="cursor-pointer bg-white hover:bg-sage-50 text-sage-700 border border-sage-400 font-semibold px-4 py-3 rounded-2xl shadow-sm transition flex items-center gap-2.5 text-xs">
-                        <i class="fa-solid fa-plus text-sage-600"></i>
-                        <span>Probar carga local adicional</span>
-                    </label>
-                    <input type="file" id="prototype-upload" accept="image/*,video/*" multiple class="hidden">
-                </div>
+            <div class="max-w-3xl mb-10">
+                <span class="text-xs font-bold uppercase tracking-wider text-sage-600">Validación Física • Prototipo a Escala</span>
+                <h2 class="font-serif text-2xl sm:text-4xl font-bold text-sand-900 mt-1">Conoce nuestro Prototipo a Escala: Plan Súper HábiCat</h2>
+                <p class="text-sm sm:text-base text-sand-800/85 mt-3 leading-relaxed">
+                    Para demostrar que tener un gimnasio felino completo no es opuesto a conservar una sala elegante y armoniosa, desarrollamos un <strong>prototipo a escala</strong> de un espacio moderno que integra todos los módulos del plan <strong>Súper HábiCat</strong> directamente sobre la pared.
+                </p>
             </div>
 
-            <!-- VIDEO PRINCIPAL DEL PROTOTIPO REAL (assets/prototipo.mp4) -->
-            <div class="mb-10 bg-white p-4 sm:p-6 rounded-3xl border border-sand-200 shadow-sm">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-xl bg-terracotta-500/15 text-terracotta-600 flex items-center justify-center">
-                            <i class="fa-solid fa-film"></i>
-                        </span>
-                        <div>
-                            <h3 class="font-bold text-base text-sand-900">Video Demostrativo del Prototipo en Funcionamiento</h3>
-                            <p class="text-xs text-sand-800/70">Prueba de estabilidad estructural e interacción felina en tiempo real</p>
-                        </div>
-                    </div>
-                    <span class="hidden sm:inline-block text-xs font-semibold bg-sage-100 text-sage-700 px-3 py-1 rounded-full">
-                        Prototipo Funcional Validado
-                    </span>
-                </div>
-
-                <div class="relative rounded-2xl overflow-hidden bg-sand-900 aspect-video max-h-[520px] flex items-center justify-center">
-                    <video id="prototype-main-video" controls playsinline preload="metadata" poster="assets/foto1.jpg" class="w-full h-full object-contain">
-                        <source src="assets/prototipo.mp4" type="video/mp4">
-                        Tu navegador no soporta la reproducción de video HTML5.
-                    </video>
-                    <!-- Aviso elegante si aún no se ha subido assets/prototipo.mp4 -->
-                    <div id="video-missing-fallback" class="hidden absolute inset-0 bg-sand-900/95 text-white flex flex-col items-center justify-center p-6 text-center">
-                        <div class="w-14 h-14 rounded-2xl bg-white/10 text-sage-500 flex items-center justify-center mb-3 text-2xl">
+            <!-- Video del Prototipo a Escala (assets/prototipo.mp4) -->
+            <div class="mb-12 bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-3xl border border-sand-200 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-xl bg-sage-100 text-sage-700 flex items-center justify-center">
                             <i class="fa-solid fa-video"></i>
+                        </span>
+                        <div>
+                            <h3 class="font-bold text-base text-sand-900">Recorrido Guiado del Prototipo a Escala</h3>
+                            <p class="text-xs text-sand-800/80">Recreación a escala de una sala elegante para demostrar la armonía entre diseño interior y el circuito Súper HábiCat</p>
                         </div>
-                        <h4 class="font-serif text-xl font-semibold">Video del Prototipo Listo para Vincular</h4>
-                        <p class="text-xs sm:text-sm text-sand-200 max-w-md mt-2">
-                            Guarda tu video dentro de la carpeta <code class="bg-white/15 px-2 py-0.5 rounded text-white">assets/</code> con el nombre exacto <code class="bg-white/15 px-2 py-0.5 rounded text-white">prototipo.mp4</code> y aparecerá automáticamente aquí.
-                        </p>
                     </div>
+                    <span class="text-xs font-semibold bg-sage-100 text-sage-700 px-3 py-1 rounded-full">Maqueta Arquitectónica</span>
+                </div>
+
+                <!-- Reproductor vertical de YouTube en alta calidad HD sin necesidad de subir el archivo a GitHub -->
+                <div class="relative w-full rounded-2xl overflow-hidden bg-sand-900/95 border border-sand-200 flex flex-col items-center justify-center py-4 px-3">
+                    <div class="w-full max-w-[320px] sm:max-w-[350px] aspect-[9/16] rounded-2xl overflow-hidden shadow-xl bg-black">
+                        <iframe
+                            class="w-full h-full border-0"
+                            src="https://www.youtube.com/embed/_q1ybs16_bo?rel=0&modestbranding=1"
+                            title="Recorrido Guiado del Prototipo a Escala - Súper HábiCat"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <a href="https://youtube.com/shorts/_q1ybs16_bo" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-1.5 text-xs text-sand-200/80 hover:text-white transition">
+                        <i class="fa-brands fa-youtube text-red-500 text-sm"></i>
+                        <span>Abrir video directamente en YouTube</span>
+                    </a>
                 </div>
             </div>
 
-            <!-- CUADRÍCULA DE LAS 5 FOTOS OFICIALES DEL PROTOTIPO (assets/foto1.jpg a assets/foto5.jpg) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="official-prototype-photos">
+            <!-- Galería de las 5 Fotos del Prototipo a Escala (assets/foto1.jpg a assets/foto5.jpg) -->
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="font-serif text-xl sm:text-2xl font-bold text-sand-900">Detalle por Módulos del Prototipo a Escala</h3>
+                <span class="text-xs text-sand-800/70">5 vistas detalladas • Haz clic para ampliar</span>
+            </div>
+
+            <div id="prototypeGallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                <!-- Foto 1 -->
-                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group">
-                    <div class="aspect-[4/3] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
-                        <span class="absolute top-3 left-3 z-10 bg-sage-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                            Foto 1 • Vista General
-                        </span>
-                        <img src="assets/foto1.jpg" alt="Vista frontal del módulo en melamina" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto1.jpg')">
+                <!-- Foto 1: Cama hexagonal y escalera de pino -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col" onclick="openLightbox('assets/foto1.jpg', '1. Cama Hexagonal y Escalera de Pino', 'Acceso principal al circuito mediante una escalera inclinada con peldaños en madera de pino, que conduce directamente a una cama hexagonal acolchada con cojín mullido para el descanso seguro del gato.')">
+                    <div class="relative aspect-[4/3] bg-sand-200 overflow-hidden">
+                        <img src="assets/foto1.jpg" alt="Cama hexagonal acolchada y escalera de pino" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="handleMissingPhoto(this, 'assets/foto1.jpg')">
+                        <span class="absolute top-3 left-3 bg-sand-900/75 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Foto 1 • Acceso</span>
                     </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-sand-900">Vista Frontal del Módulo en Melamina</h4>
-                            <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
-                                Integración arquitectónica limpia en pared aprovechando el espacio vertical sin invadir el área útil del piso.
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
-                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
-                            <span>18 mm espesor</span>
-                        </div>
+                    <div class="p-4 flex-1">
+                        <h4 class="font-bold text-sm text-sand-900">1. Cama Hexagonal y Escalera de Pino</h4>
+                        <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">Escalera estética en madera de pino con peldaños antideslizantes que conduce directamente hacia la cama hexagonal acolchada.</p>
                     </div>
                 </div>
 
-                <!-- Foto 2 -->
-                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group">
-                    <div class="aspect-[4/3] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
-                        <span class="absolute top-3 left-3 z-10 bg-sand-900 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                            Foto 2 • Estructura
-                        </span>
-                        <img src="assets/foto2.jpg" alt="Detalle de anclajes ocultos y resistencia" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto2.jpg')">
+                <!-- Foto 2: Puente colgante hacia la repisa plana con camita -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col" onclick="openLightbox('assets/foto2.jpg', '2. Puente Colgante y Repisa Plana con Camita', 'Puente colgante flexible en cuerda natural y tablillas de madera que conecta de forma segura la cama hexagonal con una repisa plana equipada con camita acolchada.')">
+                    <div class="relative aspect-[4/3] bg-sand-200 overflow-hidden">
+                        <img src="assets/foto2.jpg" alt="Puente colgante entre cama hexagonal y repisa plana" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="handleMissingPhoto(this, 'assets/foto2.jpg')">
+                        <span class="absolute top-3 left-3 bg-sand-900/75 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Foto 2 • Conexión</span>
                     </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-sand-900">Detalle de Anclajes Ocultos y Resistencia</h4>
-                            <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
-                                Sistema de fijación interna de alta carga diseñado para soportar saltos dinámicos de hasta 25 kg con total firmeza.
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
-                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
-                            <span>Seguridad estructural</span>
-                        </div>
+                    <div class="p-4 flex-1">
+                        <h4 class="font-bold text-sm text-sand-900">2. Puente Colgante y Repisa Plana</h4>
+                        <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">Puente colgante que conecta la cama hexagonal con una repisa plana dotada de una cómoda camita acolchada para descanso y observación.</p>
                     </div>
                 </div>
 
-                <!-- Foto 3 -->
-                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group">
-                    <div class="aspect-[4/3] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
-                        <span class="absolute top-3 left-3 z-10 bg-sage-700 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                            Foto 3 • Acabados
-                        </span>
-                        <img src="assets/foto3.jpg" alt="Acabados y tapacantos seguros" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto3.jpg')">
+                <!-- Foto 3: Camita, poste rascador estético y conexión al puente de melamina -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col" onclick="openLightbox('assets/foto3.jpg', '3. Camita, Rascador Estético y Puente de Melamina', 'Detalle de la estación intermedia: repisa con camita acolchada acompañada de un poste rascador recubierto en fibra natural que conecta con el puente superior de melamina.')">
+                    <div class="relative aspect-[4/3] bg-sand-200 overflow-hidden">
+                        <img src="assets/foto3.jpg" alt="Repisa con camita y rascador estético conectado al puente de melamina" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="handleMissingPhoto(this, 'assets/foto3.jpg')">
+                        <span class="absolute top-3 left-3 bg-sand-900/75 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Foto 3 • Rascador</span>
                     </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-sand-900">Acabados y Tapacantos Seguros</h4>
-                            <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
-                                Bordes sellados con tapacanto rígido redondeado, libre de astillas y superficie melamínica lavable con paño húmedo.
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
-                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
-                            <span>Pet-Safe</span>
-                        </div>
+                    <div class="p-4 flex-1">
+                        <h4 class="font-bold text-sm text-sand-900">3. Camita y Rascador Estético</h4>
+                        <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">Camita acolchada integrada con un rascador vertical estético que enlaza directamente con el puente superior en madera melamínica.</p>
                     </div>
                 </div>
 
-                <!-- Foto 4 -->
-                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group">
-                    <div class="aspect-[4/3] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
-                        <span class="absolute top-3 left-3 z-10 bg-terracotta-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                            Foto 4 • Uso Felino
-                        </span>
-                        <img src="assets/foto4.jpg" alt="Prueba de estabilidad y uso felino" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto4.jpg')">
+                <!-- Foto 4: Perspectiva del puente de melamina y conexión con todo el circuito -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col" onclick="openLightbox('assets/foto4.jpg', '4. Perspectiva del Puente de Melamina y Circuito Completo', 'Vista en perspectiva que muestra cómo el puente superior de melamina articula y conecta de extremo a extremo todo el circuito vertical sobre la pared.')">
+                    <div class="relative aspect-[4/3] bg-sand-200 overflow-hidden">
+                        <img src="assets/foto4.jpg" alt="Vista en perspectiva del puente de melamina conectado a todo el circuito" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="handleMissingPhoto(this, 'assets/foto4.jpg')">
+                        <span class="absolute top-3 left-3 bg-sand-900/75 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Foto 4 • Perspectiva</span>
                     </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-sand-900">Prueba de Estabilidad y Uso Felino</h4>
-                            <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
-                                Validación conductual con gato real comprobando comodidad, agarre antideslizante y adopción inmediata del circuito.
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
-                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
-                            <span>Validado en casa</span>
-                        </div>
+                    <div class="p-4 flex-1">
+                        <h4 class="font-bold text-sm text-sand-900">4. Perspectiva del Puente de Melamina</h4>
+                        <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">Vista en perspectiva del puente estructural en melamina y su integración fluida con cada módulo del circuito aéreo.</p>
                     </div>
                 </div>
 
-                <!-- Foto 5 -->
-                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group sm:col-span-2 lg:col-span-2">
-                    <div class="aspect-[16/9] sm:aspect-[21/9] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
-                        <span class="absolute top-3 left-3 z-10 bg-sage-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                            Foto 5 • Integración Estética
-                        </span>
-                        <img src="assets/foto5.jpg" alt="Integración estética en pared" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto5.jpg')">
+                <!-- Foto 5: Peldaños flotantes hacia la hamaca colgante superior con cojín mullido -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col" onclick="openLightbox('assets/foto5.jpg', '5. Peldaños Flotantes y Hamaca Colgante Superior', 'Peldaños flotantes escalonados en pino que conducen al punto más alto del hábitat: una hamaca colgante elevada con cojín mullido.')">
+                    <div class="relative aspect-[4/3] bg-sand-200 overflow-hidden">
+                        <img src="assets/foto5.jpg" alt="Peldaños flotantes que conducen a la hamaca colgante superior" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="handleMissingPhoto(this, 'assets/foto5.jpg')">
+                        <span class="absolute top-3 left-3 bg-sand-900/75 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Foto 5 • Nivel Superior</span>
                     </div>
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-sand-900">Integración Estética en Pared del Hogar</h4>
-                            <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
-                                Armonía visual completa entre mobiliario contemporáneo y enriquecimiento ambiental felino: protege los muebles del hogar mientras embellece el espacio.
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
-                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
-                            <span>Diseño Llave en Mano</span>
-                        </div>
+                    <div class="p-4 flex-1">
+                        <h4 class="font-bold text-sm text-sand-900">5. Peldaños Flotantes y Hamaca Colgante</h4>
+                        <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">Peldaños flotantes en pino que guían hacia la hamaca colgante en la parte superior, equipada con un suave cojín mullido.</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Contenedor de Archivos Extra Subidos Manualmente (Opcional) -->
-            <div id="uploaded-media-wrapper" class="hidden mt-10 pt-8 border-t border-sand-200">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-base text-sage-700 flex items-center gap-2">
-                        <i class="fa-solid fa-sparkles"></i>
-                        <span>Archivos Adicionales Cargados en Vivo</span>
-                    </h3>
-                    <button type="button" id="clear-uploads-btn" class="text-xs text-terracotta-600 hover:underline font-medium">
-                        Limpiar archivos adicionales
-                    </button>
-                </div>
-                <div id="uploaded-media-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
         </div>
     </section>
 
-    <!-- ==================== SECCIÓN DE CONTACTO Y REDES SOCIALES ==================== -->
-    <section id="contacto" class="py-16 lg:py-24">
+    <!-- Sección de Contacto, Redes Sociales y Créditos Académicos -->
+    <footer id="contacto" class="relative z-10 bg-sand-900 text-sand-100 py-14 sm:py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-sage-700 text-white rounded-3xl p-8 sm:p-12 lg:p-16 shadow-xl relative overflow-hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
-                    <div class="lg:col-span-7 space-y-5">
-                        <span class="inline-block bg-white/15 text-sand-100 text-xs font-semibold px-3.5 py-1.5 rounded-full">
-                            Asesoría Personalizada en Medellín y Valle de Aburrá
-                        </span>
-                        <h2 class="font-serif text-3xl sm:text-4xl font-semibold leading-tight">
-                            ¿Listo para transformar las paredes de tu hogar?
-                        </h2>
-                        <p class="text-sand-100/90 text-base max-w-xl leading-relaxed">
-                            Agenda una visita técnica o envíanos una foto de tu pared por WhatsApp. Te asesoramos con el diseño milimétrico ideal para ti y tu gato.
-                        </p>
-
-                        <!-- Redes Sociales Directas -->
-                        <div class="pt-2 flex flex-wrap gap-3">
-                            <a href="https://instagram.com/habicat" target="_blank" rel="noopener noreferrer" class="bg-white text-sand-900 hover:bg-sand-100 font-semibold px-5 py-3 rounded-2xl text-sm transition flex items-center gap-2.5 shadow-sm">
-                                <i class="fa-brands fa-instagram text-lg text-pink-600"></i>
-                                <span>@habicat</span>
-                            </a>
-                            <a href="https://tiktok.com/@habicat" target="_blank" rel="noopener noreferrer" class="bg-white/15 hover:bg-white/25 text-white font-medium px-5 py-3 rounded-2xl text-sm transition flex items-center gap-2.5 backdrop-blur-sm">
-                                <i class="fa-brands fa-tiktok text-base"></i>
-                                <span>@habicat</span>
-                            </a>
-                            <a href="https://pinterest.com/habicat" target="_blank" rel="noopener noreferrer" class="bg-white/15 hover:bg-white/25 text-white font-medium px-5 py-3 rounded-2xl text-sm transition flex items-center gap-2.5 backdrop-blur-sm">
-                                <i class="fa-brands fa-pinterest text-base"></i>
-                                <span>@habicat</span>
-                            </a>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-10 border-b border-white/10">
+                
+                <!-- Marca y Propósito -->
+                <div class="md:col-span-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-sage-600 text-white flex items-center justify-center">
+                            <i class="fa-solid fa-cat text-lg"></i>
                         </div>
+                        <span class="font-serif text-2xl font-bold text-white">HábiCat</span>
                     </div>
+                    <p class="text-sm text-sand-200/80 leading-relaxed max-w-md">
+                        Transformamos las paredes de tu hogar en hábitats felinos seguros, duraderos y estéticos en madera melamínica. Diseño personalizado con enfoque en bienestar animal.
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <a href="https://instagram.com/habicat" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-white/10 hover:bg-sage-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+                            <i class="fa-brands fa-instagram text-base"></i>
+                            <span>@habicat</span>
+                        </a>
+                        <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+                            <i class="fa-brands fa-pinterest text-base"></i>
+                            <span>Portafolio Pinterest</span>
+                        </a>
+                    </div>
+                </div>
 
-                    <!-- Tarjeta de Datos de Contacto -->
-                    <div class="lg:col-span-5 bg-white text-sand-900 p-6 sm:p-8 rounded-2xl shadow-lg space-y-4">
-                        <h3 class="font-bold text-lg border-b border-sand-200 pb-3">Canales de Atención Directa</h3>
-                        
-                        <div class="flex items-start gap-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                                <i class="fa-brands fa-whatsapp text-xl"></i>
-                            </div>
-                            <div>
-                                <span class="text-xs text-sand-800/70 block">WhatsApp Business (Cotizaciones)</span>
-                                <a href="https://wa.me/573000000000?text=Hola%20H%C3%A1biCat,%20quiero%20cotizar%20un%20h%C3%A1bitat%20para%20mi%20gato" target="_blank" class="font-semibold text-sm hover:text-sage-600 transition">
-                                    +57 300 000 0000
-                                </a>
-                            </div>
-                        </div>
+                <!-- Canales Directos de Atención -->
+                <div class="md:col-span-4 space-y-3">
+                    <h4 class="font-bold text-white text-sm uppercase tracking-wider">Contacto y Asesoría</h4>
+                    <ul class="space-y-3 text-sm text-sand-200/85">
+                        <li class="flex items-center gap-3">
+                            <i class="fa-brands fa-whatsapp text-sage-500 text-lg w-5"></i>
+                            <span>+57 300 456 7890 (Cotizaciones y visitas)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-regular fa-envelope text-sage-500 text-base w-5"></i>
+                            <span>contacto@habicat.co</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-brands fa-instagram text-sage-500 text-lg w-5"></i>
+                            <span>Instagram: <strong>@habicat</strong></span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-location-dot text-sage-500 text-base w-5"></i>
+                            <span>Medellín y Área Metropolitana, Antioquia</span>
+                        </li>
+                    </ul>
+                </div>
 
-                        <div class="flex items-start gap-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-sage-100 text-sage-700 flex items-center justify-center shrink-0">
-                                <i class="fa-regular fa-envelope text-lg"></i>
-                            </div>
-                            <div>
-                                <span class="text-xs text-sand-800/70 block">Correo Electrónico</span>
-                                <a href="mailto:contacto@habicat.co" class="font-semibold text-sm hover:text-sage-600 transition">
-                                    contacto@habicat.co
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-sand-100 text-sand-800 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-location-dot text-lg"></i>
-                            </div>
-                            <div>
-                                <span class="text-xs text-sand-800/70 block">Ubicación y Cobertura</span>
-                                <span class="font-semibold text-sm">Medellín / Valle de Aburrá, Colombia</span>
-                            </div>
+                <!-- Información Académica del Proyecto -->
+                <div class="md:col-span-3 space-y-3">
+                    <h4 class="font-bold text-white text-sm uppercase tracking-wider">Proyecto de Emprendimiento</h4>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-sand-200/80 space-y-2">
+                        <p class="font-semibold text-white">Universidad de Antioquia</p>
+                        <p>Curso: Emprendimiento</p>
+                        <div class="pt-1 border-t border-white/10">
+                            <p class="text-sand-200/60">Integrante:</p>
+                            <p class="text-white font-medium mt-0.5">• María Alejandra Angulo Franco</p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- ==================== FOOTER CON CRÉDITO ACADÉMICO ==================== -->
-    <footer class="bg-sand-100 border-t border-sand-200 py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-            <div>
-                <span class="font-serif text-xl font-semibold text-sand-900">HábiCat</span>
-                <p class="text-xs text-sand-800/75 mt-1">Un hábitat para tu gato • Diseño, fabricación e instalación a medida.</p>
             </div>
 
-            <div class="text-xs text-sand-800/80 bg-white px-4 py-2.5 rounded-xl border border-sand-200/80 shadow-sm">
-                <span class="font-semibold text-sage-700">Proyecto de Emprendimiento — Universidad de Antioquia</span>
-                <span class="block sm:inline sm:ml-2 text-sand-800">• María Alejandra Angulo Franco & Juan Manuel Sánchez Moreno</span>
+            <div class="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-sand-200/60 gap-2">
+                <p>© 2026 HábiCat — Un hábitat para tu gato. Todos los derechos reservados.</p>
+                <p>Mockup interactivo de producto y validación de prototipo a escala.</p>
             </div>
         </div>
     </footer>
 
-    <!-- ==================== MODAL DE COTIZACIÓN PERSONALIZADA ==================== -->
-    <div id="quote-modal" class="fixed inset-0 z-50 hidden bg-sand-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-sand-200 relative animate-fadeIn">
-            <button type="button" id="close-quote-modal" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-sand-100 hover:bg-sand-200 text-sand-800 flex items-center justify-center transition">
+    <!-- Modal de Resumen / Solicitud de Cotización -->
+    <div id="quoteModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-sand-200 relative">
+            <button type="button" onclick="closeQuoteModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-sand-100 hover:bg-sand-200 text-sand-800 flex items-center justify-center cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-11 h-11 rounded-2xl bg-sage-100 text-sage-700 flex items-center justify-center">
-                    <i class="fa-solid fa-clipboard-check text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="font-serif text-2xl font-semibold text-sand-900">Resumen de tu HábiCat</h3>
-                    <p class="text-xs text-sand-800/75">Listo para enviar a nuestros diseñadores</p>
-                </div>
+            <div class="w-12 h-12 rounded-2xl bg-sage-100 text-sage-700 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-paw text-xl"></i>
+            </div>
+            <h3 class="font-serif text-2xl font-bold text-sand-900">¡Tu diseño está listo!</h3>
+            <p class="text-xs text-sand-800/75 mt-1">Este es el resumen técnico de tu configuración personalizada:</p>
+            
+            <div id="modalSummaryBox" class="mt-4 p-4 rounded-2xl bg-sand-50 border border-sand-200 text-xs text-sand-900 space-y-1.5 font-medium">
+                <!-- Rellenado dinámicamente -->
             </div>
 
-            <!-- Caja de resumen generada dinámicamente -->
-            <div class="bg-sand-50 border border-sand-200 rounded-2xl p-4 space-y-2.5 text-sm text-sand-900" id="modal-summary-box">
-                <!-- Se llena con JS -->
-            </div>
-
-            <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                <a id="whatsapp-send-link" href="#" target="_blank" rel="noopener noreferrer" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-5 rounded-2xl text-center text-sm transition flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fa-brands fa-whatsapp text-lg"></i>
-                    <span>Enviar por WhatsApp</span>
-                </a>
-                <button type="button" id="copy-quote-btn" class="bg-sand-100 hover:bg-sand-200 text-sand-900 font-medium py-3.5 px-4 rounded-2xl text-sm transition flex items-center justify-center gap-2">
+            <div class="mt-5 flex flex-col sm:flex-row gap-2.5">
+                <button type="button" onclick="copyQuoteText()" class="flex-1 bg-sage-600 hover:bg-sage-700 text-white font-semibold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
                     <i class="fa-regular fa-copy"></i>
-                    <span id="copy-btn-text">Copiar resumen</span>
+                    <span>Copiar especificaciones</span>
                 </button>
+                <button type="button" onclick="closeQuoteModal()" class="bg-sand-100 hover:bg-sand-200 text-sand-900 font-semibold text-xs py-3 px-4 rounded-xl transition cursor-pointer">
+                    Seguir editando
+                </button>
+            </div>
+            <p id="copyFeedback" class="hidden text-center text-xs text-sage-700 font-semibold mt-2.5">
+                ¡Especificaciones copiadas al portapapeles! Listas para enviar a @habicat.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal Lightbox para Ampliar Fotos del Prototipo -->
+    <div id="lightboxModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeLightbox()">
+        <div class="max-w-3xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div class="relative bg-black flex items-center justify-center max-h-[72vh]">
+                <img id="lightboxImg" src="" alt="" class="max-h-[72vh] w-auto object-contain">
+                <button type="button" onclick="closeLightbox()" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-sand-900 flex items-center justify-center shadow cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 bg-white">
+                <h4 id="lightboxTitle" class="font-bold text-base text-sand-900"></h4>
+                <p id="lightboxCaption" class="text-xs sm:text-sm text-sand-800/80 mt-1"></p>
             </div>
         </div>
     </div>
 
-    <!-- ==================== MODAL LIGHTBOX PARA FOTOS DEL PROTOTIPO ==================== -->
-    <div id="lightbox-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-        <button type="button" id="close-lightbox" class="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center text-lg">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-        <img id="lightbox-img" src="" alt="Vista ampliada del prototipo HábiCat" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain">
-    </div>
-
-    <!-- ==================== LÓGICA INTERACTIVA JAVASCRIPT ==================== -->
+    <!-- Lógica Interactiva de HábiCat -->
     <script>
-        // Manejador global para fotos faltantes en assets/
-        function handleMissingPhoto(imgEl, expectedPath) {
-            const container = imgEl.parentElement;
+        // Manejador de respaldo si el archivo assets/logo.png aún no está en la carpeta
+        function handleMissingLogo(imgEl) {
             imgEl.style.display = 'none';
-            container.classList.remove('cursor-pointer', 'photo-card-trigger');
-            const placeholder = document.createElement('div');
-            placeholder.className = 'w-full h-full flex flex-col items-center justify-center p-6 text-center bg-sand-100 text-sand-800';
-            placeholder.innerHTML = `
-                <i class="fa-regular fa-image text-3xl text-sage-600 mb-2"></i>
-                <p class="text-xs font-semibold">Espacio reservado para imagen</p>
-                <code class="text-[11px] bg-white px-2 py-1 rounded border border-sand-200 mt-1.5 text-sage-700">${expectedPath}</code>
-            `;
-            container.appendChild(placeholder);
+            const fallback = document.getElementById('brandLogoFallback');
+            if (fallback) {
+                fallback.classList.remove('hidden');
+                fallback.classList.add('flex');
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Verificar si el video assets/prototipo.mp4 existe o mostrar guía elegante
-            const mainVideo = document.getElementById('prototype-main-video');
-            const videoFallback = document.getElementById('video-missing-fallback');
-            if (mainVideo) {
-                const sourceEl = mainVideo.querySelector('source');
-                sourceEl.addEventListener('error', () => {
-                    videoFallback.classList.remove('hidden');
-                });
+        // --- 1. Definición de Catálogo, Planes y Colores ---
+        const MODULES_CATALOG = [
+            { id: 'escalera', name: 'Escalera de acceso en pino', price: 85000, icon: 'fa-stairs' },
+            { id: 'hexagono', name: 'Cama hexagonal acolchada', price: 145000, icon: 'fa-cube' },
+            { id: 'repisa_plana', name: 'Repisa plana con camita', price: 95000, icon: 'fa-bed' },
+            { id: 'puente_colgante', name: 'Puente colgante curvo', price: 115000, icon: 'fa-bridge' },
+            { id: 'rascadores', name: 'Postes rascadores en sisal', price: 110000, icon: 'fa-grip-lines-vertical' },
+            { id: 'puente_melamina', name: 'Puente superior en melamina', price: 130000, icon: 'fa-archway' },
+            { id: 'peldaños', name: 'Peldaños flotantes en pino', price: 75000, icon: 'fa-shoe-prints' },
+            { id: 'hamaca', name: 'Hamaca superior con cojín', price: 125000, icon: 'fa-moon' }
+        ];
+
+        const PLANS = {
+            sencillo: {
+                name: 'HábiCat Sencillo',
+                basePrice: 120000,
+                space: 'Pared compacta de 1.5m x 2.2m',
+                modules: ['escalera', 'hexagono', 'repisa_plana']
+            },
+            intermedio: {
+                name: 'Nivel Intermedio',
+                basePrice: 140000,
+                space: 'Pared media de 2.2m x 2.4m',
+                modules: ['escalera', 'hexagono', 'puente_colgante', 'repisa_plana', 'rascadores']
+            },
+            super: {
+                name: 'Súper HábiCat',
+                basePrice: 160000,
+                space: 'Pared protagonista de 2.8m x 2.5m (Igual al prototipo)',
+                modules: ['escalera', 'hexagono', 'puente_colgante', 'repisa_plana', 'rascadores', 'puente_melamina', 'peldaños', 'hamaca']
             }
+        };
 
-            // Estado central de la configuración del usuario
-            const state = {
-                plan: 'intermedio',
-                planName: 'HábiCat Intermedio',
-                basePrice: 550000,
-                dimensions: '2.20m ancho x 1.80m alto',
-                addons: {
-                    hamaca: false,
-                    escaleritas: false,
-                    puente: true,
-                    casa: false,
-                    rascador: true,
-                    comedero: false
-                },
-                melamine: {
-                    name: 'Roble Nórdico',
-                    fill: '#C9A27E',
-                    stroke: '#A37C58'
-                },
-                wall: {
-                    name: 'Arena Cálido',
-                    color: '#F3EAD8'
-                }
-            };
+        const MELAMINE_COLORS = [
+            { id: 'roble', name: 'Roble Natural', main: '#C89D6C', dark: '#9E7447', light: '#DFB98C' },
+            { id: 'nogal', name: 'Nogal Terracota', main: '#7B4B32', dark: '#54301E', light: '#996347' },
+            { id: 'blanco', name: 'Blanco Nórdico', main: '#F4F2EE', dark: '#CFCAC0', light: '#FFFFFF' },
+            { id: 'ceniza', name: 'Gris Ceniza', main: '#9BA0A4', dark: '#6E7377', light: '#B8BDC1' },
+            { id: 'arena', name: 'Beige Arena', main: '#DFC9A6', dark: '#B59E7B', light: '#EFE0C6' },
+            { id: 'grafito', name: 'Negro Grafito', main: '#3B3B3D', dark: '#222224', light: '#555558' }
+        ];
 
-            // Diccionario de nombres legibles y precios adicionales de accesorios (COP)
-            const addonLabels = {
-                hamaca: 'Hamaca aérea acolchada',
-                escaleritas: 'Escaleritas de pared (3 peldaños)',
-                puente: 'Puente colgante en soga y melamina',
-                casa: 'Cubo / Refugio mirador con ventana',
-                rascador: 'Rascador vertical integrado en sisal',
-                comedero: 'Repisa panorámica de descanso extra'
-            };
+        const WALL_COLORS = [
+            { name: 'Verde Oliva Maqueta', hex: '#87B858' },
+            { name: 'Blanco Puro', hex: '#F7F7F5' },
+            { name: 'Arena Cálido', hex: '#E8DEC8' },
+            { name: 'Gris Minimalista', hex: '#D3D6D8' },
+            { name: 'Verde Salvia', hex: '#B9C7B4' },
+            { name: 'Terracota Suave', hex: '#D69A84' },
+            { name: 'Azul Sereno', hex: '#B8CAD8' }
+        ];
 
-            const addonPrices = {
-                hamaca: 65000,
-                escaleritas: 55000,
-                puente: 95000,
-                casa: 120000,
-                rascador: 70000,
-                comedero: 50000
-            };
+        // --- 2. Estado de la Aplicación ---
+        let state = {
+            plan: 'super',
+            selectedModules: new Set(PLANS.super.modules),
+            melamine: MELAMINE_COLORS[0],
+            wallColor: '#87B858',
+            wallName: 'Verde Oliva Maqueta'
+        };
 
-            // Configuraciones predefinidas por nivel con sus precios base en COP
-            const planPresets = {
-                sencillo: {
-                    name: 'HábiCat Sencillo',
-                    basePrice: 380000,
-                    dimensions: '1.50m ancho x 1.50m alto',
-                    addons: { hamaca: false, escaleritas: false, puente: false, casa: false, rascador: false, comedero: false }
-                },
-                intermedio: {
-                    name: 'HábiCat Intermedio',
-                    basePrice: 550000,
-                    dimensions: '2.20m ancho x 1.80m alto',
-                    addons: { hamaca: false, escaleritas: false, puente: true, casa: false, rascador: true, comedero: false }
-                },
-                super: {
-                    name: 'Súper HábiCat',
-                    basePrice: 820000,
-                    dimensions: '3.00m ancho x 2.10m alto',
-                    addons: { hamaca: true, escaleritas: false, puente: true, casa: true, rascador: true, comedero: false }
-                }
-            };
+        // --- 3. Inicialización de Controles ---
+        function initConfigurator() {
+            renderModulesChecklist();
+            renderMelamineSwatches();
+            renderWallSwatches();
+            bindPlanButtons();
+            bindCustomWallPicker();
+            updateUI();
+        }
 
-            // Formateador de moneda colombiana
-            function formatCOP(amount) {
-                return '$' + amount.toLocaleString('es-CO') + ' COP';
-            }
-
-            // Calcula el precio dinámico sumando extras respecto a los incluidos por defecto en el plan
-            function calculateTotalPrice() {
-                const preset = planPresets[state.plan];
-                let total = preset.basePrice;
-
-                Object.keys(state.addons).forEach(key => {
-                    const isChecked = state.addons[key];
-                    const wasIncludedInPreset = preset.addons[key];
-                    if (isChecked && !wasIncludedInPreset) {
-                        total += addonPrices[key];
-                    } else if (!isChecked && wasIncludedInPreset) {
-                        total -= Math.round(addonPrices[key] * 0.6);
-                    }
-                });
-
-                return Math.max(total, 320000);
-            }
-
-            // Referencias DOM
-            const planRadios = document.querySelectorAll('input[name="habicat_plan"]');
-            const planCards = document.querySelectorAll('.plan-card');
-            const addonCheckboxes = document.querySelectorAll('.addon-checkbox');
-            const melamineBtns = document.querySelectorAll('.melamine-btn');
-            const wallBtns = document.querySelectorAll('.wall-btn');
-            const customWallPicker = document.getElementById('custom-wall-picker');
-            const wallCanvas = document.getElementById('wall-canvas');
-
-            // Función principal que actualiza el render SVG, precio y textos de resumen
-            function updateVisualizer() {
-                // 1. Actualizar color de fondo de pared
-                wallCanvas.style.backgroundColor = state.wall.color;
-                document.getElementById('selected-wall-label').textContent = `${state.wall.name} (${state.wall.color.toUpperCase()})`;
-
-                // 2. Actualizar color de madera melamínica en todas las piezas SVG
-                document.getElementById('selected-melamine-label').textContent = state.melamine.name;
-                document.querySelectorAll('.wood-fill').forEach(el => {
-                    el.setAttribute('fill', state.melamine.fill);
-                    el.setAttribute('stroke', state.melamine.stroke);
-                });
-
-                // 3. Mostrar/ocultar repisas extra según plan
-                const extraShelves = document.getElementById('mod-repisas-extra');
-                if (state.plan === 'sencillo') {
-                    extraShelves.classList.replace('module-visible', 'module-hidden');
-                } else {
-                    extraShelves.classList.replace('module-hidden', 'module-visible');
-                }
-
-                // 4. Mostrar/ocultar cada accesorio en el SVG
-                Object.keys(state.addons).forEach(key => {
-                    const svgGroup = document.getElementById(`mod-${key}`);
-                    if (!svgGroup) return;
-                    if (state.addons[key]) {
-                        svgGroup.classList.remove('module-hidden');
-                        svgGroup.classList.add('module-visible');
-                    } else {
-                        svgGroup.classList.remove('module-visible');
-                        svgGroup.classList.add('module-hidden');
-                    }
-                });
-
-                // 5. Calcular precios y actualizar resumen
-                const totalPrice = calculateTotalPrice();
-                const halfPrice = Math.round(totalPrice / 2);
-
-                document.getElementById('wall-dimensions').textContent = state.dimensions;
-                document.getElementById('badge-plan-title').textContent = `${state.planName} • ${state.melamine.name}`;
-                document.getElementById('summary-price').textContent = formatCOP(totalPrice);
-                document.getElementById('summary-payment-scheme').textContent = 
-                    `Esquema flexible: 50% anticipo ($${halfPrice.toLocaleString('es-CO')}) • 50% contra entrega ($${halfPrice.toLocaleString('es-CO')})`;
-
-                const activeAddonsList = Object.keys(state.addons)
-                    .filter(k => state.addons[k])
-                    .map(k => addonLabels[k]);
-
-                const baseText = state.plan === 'sencillo' 
-                    ? '2 repisas escalón + plataforma superior' 
-                    : (state.plan === 'intermedio' ? '3 repisas escalón + plataforma' : '4 repisas escalón + plataforma');
-
-                const addonsSummary = activeAddonsList.length > 0 
-                    ? ` + ${activeAddonsList.join(', ')}` 
-                    : '';
-
-                document.getElementById('summary-details').textContent = 
-                    `Incluye: ${baseText}${addonsSummary}. Melamina ${state.melamine.name}.`;
-            }
-
-            // Eventos de cambio de Plan / Nivel
-            planRadios.forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    const selected = e.target.value;
-                    const preset = planPresets[selected];
-                    
-                    state.plan = selected;
-                    state.planName = preset.name;
-                    state.basePrice = preset.basePrice;
-                    state.dimensions = preset.dimensions;
-                    state.addons = { ...preset.addons };
-
-                    // Sincronizar checkboxes de accesorios
-                    addonCheckboxes.forEach(cb => {
-                        const addonKey = cb.dataset.addon;
-                        cb.checked = !!state.addons[addonKey];
-                    });
-
-                    // Resaltar tarjeta activa
-                    planCards.forEach(card => {
-                        if (card.dataset.plan === selected) {
-                            card.classList.remove('border-sand-200', 'bg-sand-50/50');
-                            card.classList.add('border-sage-600', 'bg-sage-50/60');
-                        } else {
-                            card.classList.add('border-sand-200', 'bg-sand-50/50');
-                            card.classList.remove('border-sage-600', 'bg-sage-50/60');
-                        }
-                    });
-
-                    updateVisualizer();
-                });
-            });
-
-            // Eventos de checkboxes de accesorios adicionales
-            addonCheckboxes.forEach(cb => {
-                cb.addEventListener('change', (e) => {
-                    const key = e.target.dataset.addon;
-                    state.addons[key] = e.target.checked;
-                    updateVisualizer();
-                });
-            });
-
-            // Eventos de selección de color de Melamina
-            melamineBtns.forEach(btn => {
+        function bindPlanButtons() {
+            document.querySelectorAll('.plan-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    melamineBtns.forEach(b => {
-                        b.classList.remove('border-sage-600', 'bg-sand-50');
-                        b.classList.add('border-transparent');
-                    });
-                    btn.classList.remove('border-transparent');
-                    btn.classList.add('border-sage-600', 'bg-sand-50');
-
-                    state.melamine = {
-                        name: btn.dataset.name,
-                        fill: btn.dataset.fill,
-                        stroke: btn.dataset.stroke
-                    };
-                    updateVisualizer();
+                    const planKey = btn.dataset.plan;
+                    state.plan = planKey;
+                    state.selectedModules = new Set(PLANS[planKey].modules);
+                    updateUI();
                 });
             });
+        }
 
-            // Eventos de selección de color de Pared (predefinidos)
-            wallBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    wallBtns.forEach(b => b.classList.remove('border-2', 'border-sage-600', 'ring-2', 'ring-sage-500/30'));
-                    btn.classList.add('border-2', 'border-sage-600', 'ring-2', 'ring-sage-500/30');
+        function renderModulesChecklist() {
+            const container = document.getElementById('modulesChecklist');
+            container.innerHTML = '';
 
-                    state.wall = {
-                        name: btn.dataset.wallName,
-                        color: btn.dataset.color
-                    };
-                    customWallPicker.value = btn.dataset.color;
-                    updateVisualizer();
-                });
-            });
+            MODULES_CATALOG.forEach(mod => {
+                const isChecked = state.selectedModules.has(mod.id);
+                const label = document.createElement('label');
+                label.className = `flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition select-none ${
+                    isChecked
+                        ? 'border-sage-600 bg-sage-50/70 text-sand-900 font-semibold'
+                        : 'border-sand-200 bg-white text-sand-800/80 hover:border-sand-300'
+                }`;
 
-            // Selector libre de color de Pared
-            customWallPicker.addEventListener('input', (e) => {
-                wallBtns.forEach(b => b.classList.remove('border-2', 'border-sage-600', 'ring-2', 'ring-sage-500/30'));
-                state.wall = {
-                    name: 'Color Personalizado',
-                    color: e.target.value
-                };
-                updateVisualizer();
-            });
-
-            // ==================== MODAL DE COTIZACIÓN Y WHATSAPP ====================
-            const quoteModal = document.getElementById('quote-modal');
-            const openQuoteBtn = document.getElementById('open-quote-modal');
-            const closeQuoteBtn = document.getElementById('close-quote-modal');
-            const modalSummaryBox = document.getElementById('modal-summary-box');
-            const whatsappSendLink = document.getElementById('whatsapp-send-link');
-            const copyQuoteBtn = document.getElementById('copy-quote-btn');
-
-            function getPlainSummaryText() {
-                const totalPrice = calculateTotalPrice();
-                const halfPrice = Math.round(totalPrice / 2);
-                const activeAddons = Object.keys(state.addons)
-                    .filter(k => state.addons[k])
-                    .map(k => `• ${addonLabels[k]}`)
-                    .join('\n') || '• Configuración base del nivel';
-
-                return `¡Hola HábiCat! Me gustaría cotizar mi hábitat personalizado:\n\n` +
-                       `*Nivel elegido:* ${state.planName}\n` +
-                       `*Inversión estimada:* ${formatCOP(totalPrice)} (50% anticipo: $${halfPrice.toLocaleString('es-CO')})\n` +
-                       `*Melamina:* ${state.melamine.name}\n` +
-                       `*Color de pared de referencia:* ${state.wall.name} (${state.wall.color})\n` +
-                       `*Espacio estimado:* ${state.dimensions}\n` +
-                       `*Accesorios incluidos:*\n${activeAddons}`;
-            }
-
-            openQuoteBtn.addEventListener('click', () => {
-                const totalPrice = calculateTotalPrice();
-                const halfPrice = Math.round(totalPrice / 2);
-                const activeAddons = Object.keys(state.addons)
-                    .filter(k => state.addons[k])
-                    .map(k => addonLabels[k]);
-
-                modalSummaryBox.innerHTML = `
-                    <div class="flex justify-between"><span class="text-sand-800/70">Plan seleccionado:</span> <strong>${state.planName}</strong></div>
-                    <div class="flex justify-between"><span class="text-sand-800/70">Valor estimado:</span> <strong class="text-sage-700">${formatCOP(totalPrice)}</strong></div>
-                    <div class="flex justify-between text-xs"><span class="text-sand-800/70">Forma de pago:</span> <span>50% anticipo ($${halfPrice.toLocaleString('es-CO')}) / 50% entrega</span></div>
-                    <div class="flex justify-between"><span class="text-sand-800/70">Tablero melamina:</span> <strong>${state.melamine.name}</strong></div>
-                    <div class="flex justify-between items-center"><span class="text-sand-800/70">Pared simulada:</span> 
-                        <span class="flex items-center gap-1.5 font-semibold">
-                            <span class="w-3.5 h-3.5 rounded-full border border-black/20 inline-block" style="background:${state.wall.color}"></span>
-                            ${state.wall.name}
-                        </span>
+                label.innerHTML = `
+                    <div class="flex items-center gap-2.5 pr-1">
+                        <input type="checkbox" class="accent-sage-600 w-4 h-4 rounded cursor-pointer" ${isChecked ? 'checked' : ''} data-mod="${mod.id}">
+                        <i class="fa-solid ${mod.icon} text-sage-600 w-3.5 text-center"></i>
+                        <span>${mod.name}</span>
                     </div>
-                    <div class="flex justify-between"><span class="text-sand-800/70">Espacio sugerido:</span> <strong>${state.dimensions}</strong></div>
-                    <div class="pt-2 border-t border-sand-200">
-                        <span class="text-sand-800/70 block mb-1">Accesorios incluidos:</span>
-                        <p class="font-medium text-xs text-sage-700">${activeAddons.length ? activeAddons.join(' • ') : 'Estructura base del nivel'}</p>
-                    </div>
+                    <span class="text-[11px] font-bold text-sage-700 shrink-0">+$${(mod.price / 1000)}k</span>
                 `;
 
-                const encodedText = encodeURIComponent(getPlainSummaryText());
-                whatsappSendLink.href = `https://wa.me/573000000000?text=${encodedText}`;
-                quoteModal.classList.remove('hidden');
-            });
-
-            closeQuoteBtn.addEventListener('click', () => quoteModal.classList.add('hidden'));
-            quoteModal.addEventListener('click', (e) => {
-                if (e.target === quoteModal) quoteModal.classList.add('hidden');
-            });
-
-            // Copiar resumen usando execCommand para compatibilidad total en iframes
-            copyQuoteBtn.addEventListener('click', () => {
-                const tempInput = document.createElement('textarea');
-                tempInput.value = getPlainSummaryText();
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempInput);
-
-                const label = document.getElementById('copy-btn-text');
-                label.textContent = '¡Copiado!';
-                setTimeout(() => { label.textContent = 'Copiar resumen'; }, 2000);
-            });
-
-            // ==================== CARGA INTERACTIVA DE FOTOS Y VIDEOS DEL PROTOTIPO ====================
-            const uploadInput = document.getElementById('prototype-upload');
-            const uploadedWrapper = document.getElementById('uploaded-media-wrapper');
-            const uploadedGrid = document.getElementById('uploaded-media-grid');
-            const clearUploadsBtn = document.getElementById('clear-uploads-btn');
-            const lightboxModal = document.getElementById('lightbox-modal');
-            const lightboxImg = document.getElementById('lightbox-img');
-            const closeLightbox = document.getElementById('close-lightbox');
-
-            // Activar Lightbox en las 5 fotos oficiales del prototipo
-            document.querySelectorAll('#official-prototype-photos .photo-card-trigger').forEach(trigger => {
-                trigger.addEventListener('click', () => {
-                    const img = trigger.querySelector('img');
-                    if (img && img.style.display !== 'none') {
-                        lightboxImg.src = img.src;
-                        lightboxModal.classList.remove('hidden');
-                    }
-                });
-            });
-
-            uploadInput.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files);
-                if (!files.length) return;
-
-                uploadedWrapper.classList.remove('hidden');
-
-                files.forEach(file => {
-                    const fileURL = URL.createObjectURL(file);
-                    const isVideo = file.type.startsWith('video/');
-
-                    const card = document.createElement('div');
-                    card.className = 'bg-white rounded-3xl overflow-hidden border border-sage-500/30 shadow-md flex flex-col';
-
-                    if (isVideo) {
-                        card.innerHTML = `
-                            <div class="aspect-[4/3] bg-black relative">
-                                <span class="absolute top-3 left-3 z-10 bg-sage-600 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">
-                                    <i class="fa-solid fa-video mr-1"></i> Video Prototipo
-                                </span>
-                                <video src="${fileURL}" controls class="w-full h-full object-contain"></video>
-                            </div>
-                            <div class="p-4 flex items-center justify-between">
-                                <span class="text-xs font-semibold text-sand-900 truncate max-w-[200px]">${file.name}</span>
-                                <span class="text-[11px] text-sage-700 font-medium">Evidencia real</span>
-                            </div>
-                        `;
+                const checkbox = label.querySelector('input');
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        state.selectedModules.add(mod.id);
                     } else {
-                        card.innerHTML = `
-                            <div class="aspect-[4/3] bg-sand-100 relative overflow-hidden group cursor-pointer">
-                                <span class="absolute top-3 left-3 z-10 bg-sage-600 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">
-                                    <i class="fa-solid fa-camera mr-1"></i> Foto Prototipo
-                                </span>
-                                <img src="${fileURL}" alt="${file.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center">
-                                    <span class="opacity-0 group-hover:opacity-100 bg-white/90 text-sand-900 text-xs font-semibold px-3 py-1.5 rounded-full shadow">
-                                        Ampliar imagen
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="p-4 flex items-center justify-between">
-                                <span class="text-xs font-semibold text-sand-900 truncate max-w-[200px]">${file.name}</span>
-                                <span class="text-[11px] text-sage-700 font-medium">Evidencia real</span>
-                            </div>
-                        `;
-                        // Evento para ampliar foto en Lightbox
-                        card.querySelector('img').addEventListener('click', () => {
-                            lightboxImg.src = fileURL;
-                            lightboxModal.classList.remove('hidden');
-                        });
+                        state.selectedModules.delete(mod.id);
                     }
-
-                    uploadedGrid.prepend(card);
+                    updateUI();
                 });
 
-                uploadInput.value = '';
+                container.appendChild(label);
+            });
+        }
+
+        function renderMelamineSwatches() {
+            const container = document.getElementById('melamineSwatches');
+            container.innerHTML = '';
+
+            MELAMINE_COLORS.forEach(color => {
+                const isSelected = state.melamine.id === color.id;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.title = color.name;
+                btn.className = `group flex flex-col items-center p-1.5 rounded-xl border transition cursor-pointer ${
+                    isSelected ? 'border-sage-600 bg-sage-50 shadow-sm' : 'border-sand-200 hover:border-sand-400'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-full border border-black/15 shadow-inner block" style="background: linear-gradient(135deg, ${color.light} 0%, ${color.main} 55%, ${color.dark} 100%);"></span>
+                    <span class="text-[10px] font-medium text-sand-900 mt-1 truncate w-full text-center">${color.name.split(' ')[0]}</span>
+                `;
+
+                btn.addEventListener('click', () => {
+                    state.melamine = color;
+                    updateUI();
+                });
+
+                container.appendChild(btn);
+            });
+        }
+
+        function renderWallSwatches() {
+            const container = document.getElementById('wallSwatches');
+            container.innerHTML = '';
+
+            WALL_COLORS.forEach(wall => {
+                const isSelected = state.wallColor.toLowerCase() === wall.hex.toLowerCase();
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.title = wall.name;
+                btn.className = `w-8 h-8 rounded-full border-2 transition cursor-pointer shadow-sm ${
+                    isSelected ? 'border-sage-600 scale-110 ring-2 ring-sage-500/30' : 'border-white hover:scale-105'
+                }`;
+                btn.style.backgroundColor = wall.hex;
+
+                btn.addEventListener('click', () => {
+                    state.wallColor = wall.hex;
+                    state.wallName = wall.name;
+                    document.getElementById('customWallPicker').value = wall.hex;
+                    updateUI();
+                });
+
+                container.appendChild(btn);
+            });
+        }
+
+        function bindCustomWallPicker() {
+            const picker = document.getElementById('customWallPicker');
+            picker.addEventListener('input', (e) => {
+                state.wallColor = e.target.value;
+                state.wallName = `Tono Personalizado (${e.target.value.toUpperCase()})`;
+                updateUI();
+            });
+        }
+
+        // --- 4. Renderizado SVG del Circuito en la Pared ---
+        function renderWallCircuitSVG() {
+            const layer = document.getElementById('modulesLayer');
+            const m = state.melamine;
+            const has = (id) => state.selectedModules.has(id);
+
+            let svgContent = '';
+
+            // 1. Escalera de acceso en pino
+            if (has('escalera')) {
+                svgContent += `
+                    <g class="module-fade">
+                        <line x1="78" y1="418" x2="128" y2="318" stroke="#E5C99B" stroke-width="9" stroke-linecap="round"/>
+                        <line x1="78" y1="418" x2="128" y2="318" stroke="#C5A36D" stroke-width="2" stroke-linecap="round"/>
+                        <rect x="75" y="392" width="22" height="5" rx="2" fill="#D8B682"/>
+                        <rect x="88" y="366" width="22" height="5" rx="2" fill="#D8B682"/>
+                        <rect x="101" y="340" width="22" height="5" rx="2" fill="#D8B682"/>
+                    </g>
+                `;
+            }
+
+            // 2. Cama hexagonal acolchada
+            if (has('hexagono')) {
+                svgContent += `
+                    <g class="module-fade">
+                        <polygon points="108,245 154,245 178,283 154,321 108,321 84,283" fill="${m.dark}" stroke="${m.main}" stroke-width="7" stroke-linejoin="round"/>
+                        <polygon points="112,251 150,251 170,283 150,315 112,315 92,283" fill="#2A231E" opacity="0.22"/>
+                        <rect x="108" y="303" width="46" height="11" rx="5" fill="#9CC1E4"/>
+                        <circle cx="96" cy="283" r="6" fill="#FAF8F5" opacity="0.5"/>
+                        <circle cx="166" cy="283" r="6" fill="#FAF8F5" opacity="0.5"/>
+                    </g>
+                `;
+            }
+
+            // 3. Puente colgante curvo
+            if (has('puente_colgante')) {
+                svgContent += `
+                    <g class="module-fade">
+                        <circle cx="202" cy="296" r="6" fill="${m.dark}"/>
+                        <path d="M 202 296 Q 262 346 322 288" fill="none" stroke="#B69567" stroke-width="5" stroke-linecap="round"/>
+                        <rect x="220" y="306" width="14" height="5" rx="1.5" fill="#E5C99B" transform="rotate(24 227 308)"/>
+                        <rect x="242" y="317" width="15" height="5" rx="1.5" fill="#E5C99B" transform="rotate(6 249 319)"/>
+                        <rect x="266" y="317" width="15" height="5" rx="1.5" fill="#E5C99B" transform="rotate(-10 273 319)"/>
+                        <rect x="290" y="307" width="15" height="5" rx="1.5" fill="#E5C99B" transform="rotate(-28 297 309)"/>
+                    </g>
+                `;
+            }
+
+            // 4. Repisa plana con camita
+            if (has('repisa_plana')) {
+                svgContent += `
+                    <g class="module-fade">
+                        <rect x="318" y="264" width="128" height="22" rx="4" fill="${m.dark}"/>
+                        <rect x="316" y="280" width="132" height="9" rx="3" fill="${m.main}"/>
+                        <rect x="326" y="268" width="108" height="13" rx="6" fill="#A5C8E8"/>
+                    </g>
+                `;
+            }
+
+            // 5. Postes rascadores en sisal
+            if (has('rascadores')) {
+                svgContent += `
+                    <g class="module-fade">
+                        <rect x="138" y="138" width="18" height="106" rx="4" fill="url(#sisalPattern)" stroke="#9C7C50" stroke-width="1"/>
+                        <rect x="422" y="156" width="18" height="124" rx="4" fill="url(#sisalPattern)" stroke="#9C7C50" stroke-width="1"/>
+                    </g>
+                `;
+            }
+
+            // 6. Puente superior en melamina
+            if (has('puente_melamina')) {
+                svgContent += `
+                    <g class="module-fade">
+                        <path d="M 134 132 L 266 132 L 306 150 L 446 150 L 446 160 L 303 160 L 263 142 L 134 142 Z" fill="${m.main}" stroke="${m.dark}" stroke-width="1.5" stroke-linejoin="round"/>
+                    </g>
+                `;
+            }
+
+            // 7. Peldaños flotantes en pino
+            if (has('peldaños')) {
+                svgContent += `
+                    <g class="module-fade">
+                        <rect x="86" y="102" width="54" height="8" rx="3" fill="#E5C99B" stroke="#C5A36D" stroke-width="1"/>
+                        <rect x="168" y="84" width="58" height="8" rx="3" fill="#E5C99B" stroke="#C5A36D" stroke-width="1"/>
+                    </g>
+                `;
+            }
+
+            // 8. Hamaca superior con cojín
+            if (has('hamaca')) {
+                svgContent += `
+                    <g class="module-fade">
+                        <circle cx="256" cy="64" r="6" fill="${m.dark}"/>
+                        <circle cx="404" cy="48" r="6" fill="${m.dark}"/>
+                        <path d="M 256 64 Q 328 128 404 48" fill="none" stroke="#B69567" stroke-width="6" stroke-linecap="round"/>
+                        <rect x="302" y="75" width="46" height="13" rx="6" fill="#9CC1E4"/>
+                        <rect x="358" y="74" width="14" height="5" rx="1.5" fill="#E5C99B" transform="rotate(-34 365 76)"/>
+                        <rect x="376" y="60" width="14" height="5" rx="1.5" fill="#E5C99B" transform="rotate(-44 383 62)"/>
+                    </g>
+                `;
+            }
+
+            layer.innerHTML = svgContent;
+        }
+
+        // --- 5. Actualización General de Interfaz y Precios ---
+        function updateUI() {
+            document.querySelectorAll('.plan-btn').forEach(btn => {
+                const isSelected = btn.dataset.plan === state.plan;
+                btn.className = isSelected
+                    ? 'plan-btn text-left p-3.5 rounded-2xl border-2 border-sage-600 bg-sage-50/80 transition cursor-pointer shadow-sm'
+                    : 'plan-btn text-left p-3.5 rounded-2xl border-2 border-sand-200 hover:border-sage-400 bg-white transition cursor-pointer';
             });
 
-            clearUploadsBtn.addEventListener('click', () => {
-                uploadedGrid.innerHTML = '';
-                uploadedWrapper.classList.add('hidden');
+            renderModulesChecklist();
+            renderMelamineSwatches();
+            renderWallSwatches();
+
+            document.getElementById('melamineLabel').textContent = state.melamine.name;
+            document.getElementById('wallLabel').textContent = state.wallName;
+            document.getElementById('roomPreviewCanvas').style.backgroundColor = state.wallColor;
+            document.getElementById('melamineBadgeDot').style.backgroundColor = state.melamine.main;
+            document.getElementById('activeConfigTitle').textContent = `${PLANS[state.plan].name} • ${state.melamine.name}`;
+            document.getElementById('spaceRecommendation').textContent = `Espacio sugerido: ${PLANS[state.plan].space}`;
+
+            let modulesTotal = 0;
+            const activeNames = [];
+            MODULES_CATALOG.forEach(mod => {
+                if (state.selectedModules.has(mod.id)) {
+                    modulesTotal += mod.price;
+                    activeNames.push(mod.name.toLowerCase());
+                }
             });
 
-            closeLightbox.addEventListener('click', () => lightboxModal.classList.add('hidden'));
-            lightboxModal.addEventListener('click', (e) => {
-                if (e.target === lightboxModal) lightboxModal.classList.add('hidden');
-            });
+            const total = PLANS[state.plan].basePrice + modulesTotal;
+            document.getElementById('totalPriceDisplay').textContent = `$${total.toLocaleString('es-CO')}`;
 
-            // Inicializar visualización por defecto
-            updateVisualizer();
-        });
+            const summaryEl = document.getElementById('selectedSummaryText');
+            if (activeNames.length === 0) {
+                summaryEl.textContent = 'Selecciona al menos un módulo para armar tu circuito en la pared.';
+            } else {
+                summaryEl.textContent = `Incluye (${activeNames.length} módulos): ${activeNames.join(', ')}.`;
+            }
+
+            renderWallCircuitSVG();
+        }
+
+        // --- 6. Funciones de Modal de Cotización y Lightbox ---
+        function openQuoteModal() {
+            const modal = document.getElementById('quoteModal');
+            const summaryBox = document.getElementById('modalSummaryBox');
+            const totalText = document.getElementById('totalPriceDisplay').textContent;
+
+            const activeModules = MODULES_CATALOG
+                .filter(m => state.selectedModules.has(m.id))
+                .map(m => `• ${m.name}`)
+                .join('<br>');
+
+            summaryBox.innerHTML = `
+                <div><span class="text-sand-800/70">Plan base:</span> <strong>${PLANS[state.plan].name}</strong></div>
+                <div><span class="text-sand-800/70">Tablero de melamina:</span> <strong>${state.melamine.name}</strong></div>
+                <div><span class="text-sand-800/70">Color de pared simulado:</span> <strong>${state.wallName}</strong></div>
+                <div class="pt-1 border-t border-sand-200"><span class="text-sand-800/70">Módulos incluidos:</span><br>${activeModules || 'Ninguno'}</div>
+                <div class="pt-1.5 border-t border-sand-200 text-sm text-sage-700 font-bold">Total estimado: ${totalText} COP</div>
+            `;
+
+            document.getElementById('copyFeedback').classList.add('hidden');
+            modal.classList.remove('hidden');
+        }
+
+        function closeQuoteModal() {
+            document.getElementById('quoteModal').classList.add('hidden');
+        }
+
+        function copyQuoteText() {
+            const totalText = document.getElementById('totalPriceDisplay').textContent;
+            const activeList = MODULES_CATALOG
+                .filter(m => state.selectedModules.has(m.id))
+                .map(m => m.name)
+                .join(', ');
+
+            const textToCopy = `¡Hola @habicat! Me gustaría cotizar mi diseño personalizado:\n- Plan: ${PLANS[state.plan].name}\n- Melamina: ${state.melamine.name}\n- Color de pared: ${state.wallName}\n- Módulos: ${activeList}\n- Inversión estimada: ${totalText} COP`;
+
+            const tempArea = document.createElement('textarea');
+            tempArea.value = textToCopy;
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempArea);
+
+            document.getElementById('copyFeedback').classList.remove('hidden');
+        }
+
+        function openLightbox(src, title, caption) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightboxTitle').textContent = title;
+            document.getElementById('lightboxCaption').textContent = caption;
+            document.getElementById('lightboxModal').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxModal').classList.add('hidden');
+        }
+
+        window.addEventListener('DOMContentLoaded', initConfigurator);
     </script>
 </body>
 </html>
