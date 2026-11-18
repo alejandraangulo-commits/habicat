@@ -6,10 +6,10 @@
     <title>HábiCat | Un hábitat para tu gato</title>
     <!-- Tailwind CSS vía CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter & Playfair Display para toques editoriales -->
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome para iconos limpios -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -18,8 +18,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Outfit', 'sans-serif'],
                     },
                     colors: {
                         sand: {
@@ -84,10 +84,10 @@
 
     <!-- ==================== NAVEGACIÓN PRINCIPAL ==================== -->
     <header class="sticky top-0 z-40 bg-sand-50/90 backdrop-blur-md border-b border-sand-200/70">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Logo HábiCat con ilustración minimalista de gato en línea continua -->
+            <!-- Logo HábiCat con soporte para assets/logo.png y fallback vectorial -->
             <a href="#inicio" class="flex items-center gap-3 group">
-                <div class="w-11 h-11 rounded-2xl bg-sage-600 text-white flex items-center justify-center shadow-sm group-hover:bg-sage-700 transition">
+                <img src="assets/logo.png" alt="Logo HábiCat" class="h-11 w-auto object-contain rounded-xl" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="w-11 h-11 rounded-2xl bg-sage-600 text-white hidden items-center justify-center shadow-sm group-hover:bg-sage-700 transition">
                     <svg class="w-7 h-7" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 14L7 6L14 10C16.5 9.3 19.5 9.3 22 10L29 6L27 14C28.5 16.2 29 19 28.5 22C27.5 27.5 23 30 18 30C13 30 8.5 27.5 7.5 22C7 19 7.5 16.2 9 14Z"/>
                         <circle cx="14" cy="18" r="1.2" fill="currentColor"/>
@@ -96,8 +96,8 @@
                     </svg>
                 </div>
                 <div>
-                    <span class="font-serif text-2xl font-semibold tracking-tight text-sand-900 block leading-none">HábiCat</span>
-                    <span class="text-[11px] uppercase tracking-widest text-sage-700 font-medium">Un hábitat para tu gato</span>
+                    <span class="font-serif text-2xl font-bold tracking-tight text-sand-900 block leading-none">HábiCat</span>
+                    <span class="text-[11px] uppercase tracking-widest text-sage-700 font-semibold">Un hábitat para tu gato</span>
                 </div>
             </a>
 
@@ -130,17 +130,34 @@
     <section id="inicio" class="relative overflow-hidden py-14 lg:py-24 border-b border-sand-200/60">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                <!-- Columna de Texto -->
+                <!-- Columna de Texto y Logo Oficial de Bienvenida -->
                 <div class="lg:col-span-7 space-y-6">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sage-100 text-sage-700 text-xs font-semibold tracking-wide">
-                        <i class="fa-solid fa-paw"></i>
-                        <span>Diseño Interior & Enriquecimiento Ambiental Felino</span>
+                    <!-- Logo Oficial del Emprendimiento en la Bienvenida -->
+                    <div class="inline-block bg-white/90 backdrop-blur-sm p-4 sm:p-5 rounded-3xl border border-sand-200/90 shadow-sm">
+                        <img src="assets/logo.png" alt="Logo HábiCat - Un hábitat para tu gato" class="max-h-24 sm:max-h-28 w-auto object-contain" onerror="this.style.display='none'; document.getElementById('hero-logo-fallback').classList.remove('hidden');">
+                        <div id="hero-logo-fallback" class="hidden flex items-center gap-3.5 px-2 py-1">
+                            <div class="w-12 h-12 rounded-2xl bg-sage-600 text-white flex items-center justify-center">
+                                <i class="fa-solid fa-cat text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-serif text-2xl font-bold text-sand-900 leading-none">HábiCat</p>
+                                <p class="text-xs text-sage-700 font-medium mt-1">Archivo esperado: <code class="bg-sand-100 px-1.5 py-0.5 rounded">assets/logo.png</code></p>
+                            </div>
+                        </div>
                     </div>
-                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-sand-900 leading-tight">
-                        Un hogar espectacular para ti, un <span class="text-sage-600 italic">hábitat vertical</span> para tu gato.
+
+                    <div class="block">
+                        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sage-100 text-sage-700 text-xs font-semibold tracking-wide">
+                            <i class="fa-solid fa-paw"></i>
+                            <span>Diseño Interior & Enriquecimiento Ambiental Felino</span>
+                        </span>
+                    </div>
+
+                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-sand-900 leading-tight">
+                        HábiCat — <span class="text-sage-600">Un hábitat para tu gato</span>
                     </h1>
                     <p class="text-lg sm:text-xl text-sand-800/90 leading-relaxed max-w-2xl">
-                        Elimina la disyuntiva entre una casa estética y un gato feliz. Diseñamos, fabricamos e instalamos hábitats verticales a medida en melamina de alta resistencia.
+                        Diseño, fabricación e instalación "llave en mano" de gimnasios aéreos personalizados en madera melamínica de alta resistencia. Transforma tus paredes sin sacrificar la estética de tu hogar.
                     </p>
                     
                     <!-- Beneficios clave rápidos -->
@@ -254,13 +271,13 @@
                                         <input type="radio" name="habicat_plan" value="sencillo" class="w-4 h-4 text-sage-600 focus:ring-sage-500">
                                         <div>
                                             <span class="font-bold text-sand-900 block">HábiCat Sencillo</span>
-                                            <span class="text-xs text-sage-700 font-medium">Ideal para espacios compactos / 1 gato</span>
+                                            <span class="text-xs text-sage-700 font-medium">Ideal para espacios compactos</span>
                                         </div>
                                     </div>
-                                    <span class="text-xs font-semibold bg-sand-200/70 text-sand-800 px-2.5 py-1 rounded-lg">Nivel 1</span>
+                                    <span class="text-xs font-bold bg-sand-200/80 text-sand-900 px-2.5 py-1 rounded-lg">$380.000 COP</span>
                                 </div>
                                 <p class="text-xs text-sand-800/80 mt-2 pl-7">
-                                    Base: 2 repisas escalón + 1 plataforma de descanso superior.
+                                    Base: 2 repisas escalón + 1 repisa panorámica de descanso.
                                 </p>
                             </label>
 
@@ -274,13 +291,13 @@
                                                 <span class="font-bold text-sand-900">HábiCat Intermedio</span>
                                                 <span class="text-[10px] uppercase font-bold bg-sage-600 text-white px-2 py-0.5 rounded-full">Más elegido</span>
                                             </div>
-                                            <span class="text-xs text-sage-700 font-medium">Gatos activos / apartamentos medianos</span>
+                                            <span class="text-xs text-sage-700 font-medium">Equilibrio perfecto de altura y juego</span>
                                         </div>
                                     </div>
-                                    <span class="text-xs font-semibold bg-sage-200/70 text-sage-800 px-2.5 py-1 rounded-lg">Nivel 2</span>
+                                    <span class="text-xs font-bold bg-sage-200/80 text-sage-900 px-2.5 py-1 rounded-lg">$550.000 COP</span>
                                 </div>
                                 <p class="text-xs text-sand-800/80 mt-2 pl-7">
-                                    Base: 3 repisas escalón + 1 puente colgante + 1 poste rascador vertical.
+                                    Base: 3 repisas + puente colgante en soga y melamina + rascador vertical.
                                 </p>
                             </label>
 
@@ -291,13 +308,13 @@
                                         <input type="radio" name="habicat_plan" value="super" class="w-4 h-4 text-sage-600 focus:ring-sage-500">
                                         <div>
                                             <span class="font-bold text-sand-900 block">Súper HábiCat</span>
-                                            <span class="text-xs text-sage-700 font-medium">Múltiples gatos o paredes amplias</span>
+                                            <span class="text-xs text-sage-700 font-medium">Circuito aéreo completo de lujo</span>
                                         </div>
                                     </div>
-                                    <span class="text-xs font-semibold bg-terracotta-500/15 text-terracotta-600 px-2.5 py-1 rounded-lg">Nivel 3</span>
+                                    <span class="text-xs font-bold bg-terracotta-500/15 text-terracotta-600 px-2.5 py-1 rounded-lg">$820.000 COP</span>
                                 </div>
                                 <p class="text-xs text-sand-800/80 mt-2 pl-7">
-                                    Circuito completo: 4 repisas escalón + puente colgante + casa cubo aéreo + hamaca + rascador.
+                                    Circuito total: 4 repisas + puente colgante + cubo refugio + hamaca acolchada + rascador.
                                 </p>
                             </label>
                         </div>
@@ -310,38 +327,56 @@
                                 <span class="w-7 h-7 rounded-full bg-sage-600 text-white text-xs font-bold flex items-center justify-center">2</span>
                                 <h3 class="font-semibold text-lg text-sand-900">Módulos y Accesorios</h3>
                             </div>
-                            <span class="text-xs text-sand-800/70">Activa o desactiva</span>
+                            <span class="text-xs text-sand-800/70">Personaliza tu circuito</span>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="addons-container">
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <input type="checkbox" data-addon="hamaca" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                <span class="text-xs font-medium text-sand-900">Hamaca flotante suave</span>
+                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-addon="hamaca" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
+                                    <span class="text-xs font-medium text-sand-900">Hamaca aérea acolchada</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-sage-700">+$65k</span>
                             </label>
 
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <input type="checkbox" data-addon="escaleritas" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                <span class="text-xs font-medium text-sand-900">Escaleritas (set 3 peldaños)</span>
+                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-addon="escaleritas" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
+                                    <span class="text-xs font-medium text-sand-900">Escaleritas (3 peldaños)</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-sage-700">+$55k</span>
                             </label>
 
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <input type="checkbox" data-addon="puente" checked class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                <span class="text-xs font-medium text-sand-900">Puente colgante sisal</span>
+                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-addon="puente" checked class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
+                                    <span class="text-xs font-medium text-sand-900">Puente colgante soga</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-sage-700">+$95k</span>
                             </label>
 
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <input type="checkbox" data-addon="casa" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                <span class="text-xs font-medium text-sand-900">Casa / Cubo refugio aéreo</span>
+                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-addon="casa" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
+                                    <span class="text-xs font-medium text-sand-900">Cubo / Refugio mirador</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-sage-700">+$120k</span>
                             </label>
 
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <input type="checkbox" data-addon="rascador" checked class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                <span class="text-xs font-medium text-sand-900">Poste rascador vertical</span>
+                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-addon="rascador" checked class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
+                                    <span class="text-xs font-medium text-sand-900">Rascador vertical sisal</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-sage-700">+$70k</span>
                             </label>
 
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
-                                <input type="checkbox" data-addon="comedero" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
-                                <span class="text-xs font-medium text-sand-900">Comedero elevado en altura</span>
+                            <label class="flex items-center justify-between gap-2 p-3 rounded-xl border border-sand-200 hover:bg-sand-50 cursor-pointer transition">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-addon="comedero" class="addon-checkbox w-4 h-4 rounded text-sage-600 focus:ring-sage-500">
+                                    <span class="text-xs font-medium text-sand-900">Repisa panorámica extra</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-sage-700">+$50k</span>
                             </label>
                         </div>
                     </div>
@@ -357,12 +392,17 @@
                         <div>
                             <div class="flex justify-between items-center mb-2">
                                 <label class="text-xs font-semibold uppercase tracking-wider text-sand-800">Tablero de Melamina</label>
-                                <span id="selected-melamine-label" class="text-xs font-bold text-sage-700">Roble Natural</span>
+                                <span id="selected-melamine-label" class="text-xs font-bold text-sage-700">Roble Nórdico</span>
                             </div>
                             <div class="grid grid-cols-5 gap-2.5" id="melamine-swatches">
-                                <button type="button" data-name="Roble Natural" data-fill="#C9A27E" data-stroke="#A37C58" data-dark="#9B7451" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-sage-600 bg-sand-50">
+                                <button type="button" data-name="Roble Nórdico" data-fill="#C9A27E" data-stroke="#A37C58" data-dark="#9B7451" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-sage-600 bg-sand-50">
                                     <span class="w-9 h-9 rounded-full shadow-inner border border-black/10" style="background: linear-gradient(135deg, #D8B490 0%, #B88E68 100%);"></span>
-                                    <span class="text-[10px] font-medium text-center leading-tight">Roble Natural</span>
+                                    <span class="text-[10px] font-medium text-center leading-tight">Roble Nórdico</span>
+                                </button>
+
+                                <button type="button" data-name="Blanco Puro Minimalista" data-fill="#F8FAFC" data-stroke="#CBD5E1" data-dark="#E2E8F0" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
+                                    <span class="w-9 h-9 rounded-full shadow-inner border border-slate-300" style="background: #F8FAFC;"></span>
+                                    <span class="text-[10px] font-medium text-center leading-tight">Blanco Puro</span>
                                 </button>
 
                                 <button type="button" data-name="Nogal Terracota" data-fill="#7A4B3A" data-stroke="#593326" data-dark="#522E22" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
@@ -370,19 +410,14 @@
                                     <span class="text-[10px] font-medium text-center leading-tight">Nogal Oscuro</span>
                                 </button>
 
-                                <button type="button" data-name="Blanco Nieve" data-fill="#F8FAFC" data-stroke="#CBD5E1" data-dark="#E2E8F0" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
-                                    <span class="w-9 h-9 rounded-full shadow-inner border border-slate-300" style="background: #F8FAFC;"></span>
-                                    <span class="text-[10px] font-medium text-center leading-tight">Blanco Nieve</span>
-                                </button>
-
-                                <button type="button" data-name="Gris Grafito" data-fill="#475569" data-stroke="#1E293B" data-dark="#334155" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
+                                <button type="button" data-name="Gris Grafito Moderno" data-fill="#475569" data-stroke="#1E293B" data-dark="#334155" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
                                     <span class="w-9 h-9 rounded-full shadow-inner border border-black/20" style="background: #475569;"></span>
                                     <span class="text-[10px] font-medium text-center leading-tight">Gris Grafito</span>
                                 </button>
 
-                                <button type="button" data-name="Arena Nórdico" data-fill="#E3D5BE" data-stroke="#BFA988" data-dark="#C9B79C" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
+                                <button type="button" data-name="Arena / Beige Cálido" data-fill="#E3D5BE" data-stroke="#BFA988" data-dark="#C9B79C" class="melamine-btn group flex flex-col items-center gap-1.5 p-1.5 rounded-xl border-2 border-transparent hover:border-sand-300">
                                     <span class="w-9 h-9 rounded-full shadow-inner border border-black/10" style="background: #E3D5BE;"></span>
-                                    <span class="text-[10px] font-medium text-center leading-tight">Arena Nórdico</span>
+                                    <span class="text-[10px] font-medium text-center leading-tight">Arena Cálido</span>
                                 </button>
                             </div>
                         </div>
@@ -391,21 +426,21 @@
                         <div class="pt-2 border-t border-sand-100">
                             <div class="flex justify-between items-center mb-2">
                                 <label class="text-xs font-semibold uppercase tracking-wider text-sand-800">Color de Pared de tu Hogar</label>
-                                <span id="selected-wall-label" class="text-xs font-bold text-sage-700">Beige Cálido (#F5F0E6)</span>
+                                <span id="selected-wall-label" class="text-xs font-bold text-sage-700">Arena Cálido (#F3EAD8)</span>
                             </div>
                             <div class="flex flex-wrap items-center gap-2.5">
-                                <button type="button" data-wall-name="Blanco Puro" data-color="#FFFFFF" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #FFFFFF;" title="Blanco Puro"></button>
-                                <button type="button" data-wall-name="Gris Nórdico" data-color="#E5E7EB" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #E5E7EB;" title="Gris Nórdico"></button>
-                                <button type="button" data-wall-name="Beige Cálido" data-color="#F5F0E6" class="wall-btn w-8 h-8 rounded-full border-2 border-sage-600 ring-2 ring-sage-500/30 shadow-sm transition transform hover:scale-110" style="background-color: #F5F0E6;" title="Beige Cálido"></button>
-                                <button type="button" data-wall-name="Verde Salvia" data-color="#D1DDD3" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #D1DDD3;" title="Verde Salvia"></button>
-                                <button type="button" data-wall-name="Azul Pizarra" data-color="#CBD5E1" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #CBD5E1;" title="Azul Pizarra"></button>
-                                <button type="button" data-wall-name="Terracota Suave" data-color="#E8C5B8" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #E8C5B8;" title="Terracota Suave"></button>
+                                <button type="button" data-wall-name="Blanco Galería" data-color="#F8F9FA" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #F8F9FA;" title="Blanco Galería"></button>
+                                <button type="button" data-wall-name="Gris Piedra Suave" data-color="#E2E8F0" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #E2E8F0;" title="Gris Piedra Suave"></button>
+                                <button type="button" data-wall-name="Verde Salvia Nórdico" data-color="#D8E2DC" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #D8E2DC;" title="Verde Salvia Nórdico"></button>
+                                <button type="button" data-wall-name="Terracota Pastel" data-color="#EAD2AC" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #EAD2AC;" title="Terracota Pastel"></button>
+                                <button type="button" data-wall-name="Azul Pizarra Suave" data-color="#CBD5E1" class="wall-btn w-8 h-8 rounded-full border border-slate-300 shadow-sm transition transform hover:scale-110" style="background-color: #CBD5E1;" title="Azul Pizarra Suave"></button>
+                                <button type="button" data-wall-name="Arena Cálido" data-color="#F3EAD8" class="wall-btn w-8 h-8 rounded-full border-2 border-sage-600 ring-2 ring-sage-500/30 shadow-sm transition transform hover:scale-110" style="background-color: #F3EAD8;" title="Arena Cálido"></button>
                                 
                                 <!-- Selector libre de color -->
                                 <label class="ml-auto flex items-center gap-2 bg-sand-100 hover:bg-sand-200/80 px-3 py-1.5 rounded-xl cursor-pointer transition border border-sand-300/70">
                                     <i class="fa-solid fa-palette text-sage-700 text-xs"></i>
                                     <span class="text-xs font-medium text-sand-900">Otro color</span>
-                                    <input type="color" id="custom-wall-picker" value="#F5F0E6" class="w-5 h-5 border-0 bg-transparent cursor-pointer p-0">
+                                    <input type="color" id="custom-wall-picker" value="#F3EAD8" class="w-5 h-5 border-0 bg-transparent cursor-pointer p-0">
                                 </label>
                             </div>
                         </div>
@@ -423,12 +458,12 @@
                                 <span class="text-xs font-semibold text-sand-800 uppercase tracking-wider">Simulador de Pared en Vivo</span>
                             </div>
                             <span id="badge-plan-title" class="text-xs font-bold bg-sage-100 text-sage-700 px-3 py-1 rounded-full">
-                                HábiCat Intermedio • Roble Natural
+                                HábiCat Intermedio • Roble Nórdico
                             </span>
                         </div>
 
                         <!-- PARED SIMULADA -->
-                        <div id="wall-canvas" class="relative w-full aspect-[16/11] rounded-2xl overflow-hidden border border-sand-300/80 shadow-inner flex items-end" style="background-color: #F5F0E6;">
+                        <div id="wall-canvas" class="relative w-full aspect-[16/11] rounded-2xl overflow-hidden border border-sand-300/80 shadow-inner flex items-end" style="background-color: #F3EAD8;">
                             
                             <!-- Iluminación ambiental sutil -->
                             <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle at 25% 15%, rgba(255,255,255,0.45) 0%, rgba(0,0,0,0.06) 100%);"></div>
@@ -528,73 +563,18 @@
                                     <rect class="wood-fill" x="406" y="178" width="18" height="9" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
                                     <rect class="wood-fill" x="430" y="186" width="18" height="9" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
                                     <rect class="wood-fill" x="454" y="192" width="18" height="9" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
-                                    <rect class="wood-fill" x="478" y="197" width="18" height="9" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
-                                    <rect class="wood-fill" x="502" y="203" width="18" height="9" rx="2" fill="#C9A27E" stroke="#A37C58" stroke-width="1.5"/>
-                                </g>
-
-                                <!-- ACCESORIO: CASA / CUBO REFUGIO AÉREO -->
-                                <g id="mod-casa" class="module-group module-hidden" filter="url(#dropShadow)">
-                                    <!-- Caja principal -->
-                                    <rect class="wood-fill" x="415" y="65" width="110" height="95" rx="12" fill="#C9A27E" stroke="#A37C58" stroke-width="2.5"/>
-                                    <!-- Interior oscuro -->
-                                    <circle cx="470" cy="115" r="30" fill="#2E2922"/>
-                                    <!-- Orejitas decorativas superiores en melamina -->
-                                    <path class="wood-fill" d="M430 65 L442 48 L456 65 Z" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <path class="wood-fill" d="M484 65 L498 48 L510 65 Z" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <!-- Cojín interno -->
-                                    <path d="M446 132 Q470 142 494 132" stroke="#E8C5B8" stroke-width="6" stroke-linecap="round" fill="none"/>
-                                </g>
-
-                                <!-- ACCESORIO: HAMACA FLOTANTE DE TELA SUAVE -->
-                                <g id="mod-hamaca" class="module-group module-hidden" filter="url(#dropShadow)">
-                                    <!-- Brazos laterales de melamina -->
-                                    <rect class="wood-fill" x="255" y="268" width="14" height="32" rx="4" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <rect class="wood-fill" x="375" y="268" width="14" height="32" rx="4" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <!-- Tela colgante -->
-                                    <path d="M269 275 Q322 318 375 275 L375 288 Q322 332 269 288 Z" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>
-                                </g>
-
-                                <!-- ACCESORIO: ESCALERITAS DE PARED (SET DE 3 PELDAÑOS) -->
-                                <g id="mod-escaleritas" class="module-group module-hidden" filter="url(#dropShadow)">
-                                    <rect class="wood-fill" x="550" y="135" width="48" height="12" rx="3" fill="#C9A27E" stroke="#A37C58" stroke-width="1.8"/>
-                                    <rect class="wood-fill" x="585" y="102" width="48" height="12" rx="3" fill="#C9A27E" stroke="#A37C58" stroke-width="1.8"/>
-                                    <rect class="wood-fill" x="620" y="69" width="48" height="12" rx="3" fill="#C9A27E" stroke="#A37C58" stroke-width="1.8"/>
-                                </g>
-
-                                <!-- ACCESORIO: COMEDERO ELEVADO EN ALTURA -->
-                                <g id="mod-comedero" class="module-group module-hidden" filter="url(#dropShadow)">
-                                    <rect class="wood-fill" x="455" y="285" width="95" height="15" rx="4" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                                    <!-- Dos platicos cerámicos -->
-                                    <path d="M472 275 H498 L494 285 H476 Z" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
-                                    <path d="M510 275 H536 L532 285 H514 Z" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
-                                </g>
-
-                                <!-- GATITO ILUSTRADO EN LA PLATAFORMA SUPERIOR -->
-                                <g transform="translate(310, 124)">
-                                    <!-- Cola -->
-                                    <path d="M12 43 Q-6 36 -2 20" stroke="#2E2922" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-                                    <!-- Cuerpo -->
-                                    <ellipse cx="26" cy="34" rx="16" ry="13" fill="#2E2922"/>
-                                    <!-- Cabeza -->
-                                    <circle cx="38" cy="20" r="11" fill="#2E2922"/>
-                                    <!-- Orejas -->
-                                    <path d="M29 13 L31 3 L38 10 Z" fill="#2E2922"/>
-                                    <path d="M39 10 L46 3 L48 13 Z" fill="#2E2922"/>
-                                    <!-- Ojos cerrados felices -->
-                                    <path d="M34 19 Q36 17 38 19" stroke="#F8FAFC" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                                    <path d="M41 19 Q43 17 45 19" stroke="#F8FAFC" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                                </g>
-
-                            </svg>
-                        </div>
-
-                        <!-- RESUMEN DE CONFIGURACIÓN Y BOTÓN COTIZAR -->
+                        <!-- RESUMEN DE CONFIGURACIÓN, PRECIO EN COP Y BOTÓN COTIZAR -->
                         <div class="mt-5 pt-5 border-t border-sand-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div class="space-y-1">
-                                <p class="text-xs font-semibold uppercase tracking-wider text-sage-700">Tu selección personalizada</p>
-                                <h4 id="summary-title" class="font-bold text-lg text-sand-900">HábiCat Intermedio</h4>
-                                <p id="summary-details" class="text-xs text-sand-800/80 leading-relaxed max-w-md">
-                                    Incluye: 3 repisas escalón, puente colgante sisal y poste rascador vertical. Melamina Roble Natural.
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-xs font-semibold uppercase tracking-wider text-sage-700">Inversión Estimada Llave en Mano:</span>
+                                    <span id="summary-price" class="text-lg font-extrabold text-sand-900 bg-sage-100 px-2.5 py-0.5 rounded-lg">$550.000 COP</span>
+                                </div>
+                                <p id="summary-payment-scheme" class="text-[11px] font-medium text-sage-700">
+                                    Esquema flexible: 50% anticipo ($275.000) • 50% contra entrega instalada ($275.000)
+                                </p>
+                                <p id="summary-details" class="text-xs text-sand-800/80 leading-relaxed max-w-md pt-1">
+                                    Incluye: 3 repisas escalón, puente colgante soga y rascador vertical sisal. Melamina Roble Nórdico.
                                 </p>
                             </div>
                             <button type="button" id="open-quote-modal" class="shrink-0 bg-sage-600 hover:bg-sage-700 text-white font-semibold px-6 py-3.5 rounded-2xl shadow-sm hover:shadow transition flex items-center justify-center gap-2 text-sm">
@@ -609,134 +589,189 @@
         </div>
     </section>
 
-    <!-- ==================== GALERÍA DE PROTOTIPO REAL (FOTOS Y VIDEOS) ==================== -->
+    <!-- ==================== GALERÍA FIJA DEL PROTOTIPO REAL (CARPETA assets/) ==================== -->
     <section id="prototipo" class="py-16 lg:py-24 bg-sand-100/70 border-y border-sand-200/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-sage-600">Validación Técnica y Etológica</span>
-                    <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-sand-900 mt-2">Prototipo Real HábiCat</h2>
+                    <span class="text-xs font-bold uppercase tracking-widest text-sage-600">Validación Técnica y Etológica Real</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-sand-900 mt-2">Nuestro Prototipo Real en Melamina</h2>
                     <p class="text-sand-800/80 mt-2 max-w-2xl text-sm sm:text-base">
-                        Conoce nuestras pruebas físicas en madera melamínica, resistencia de anclajes y la reacción real de nuestros gatos probadores.
+                        Evidencia física de nuestro prototipo instalado: pruebas de resistencia en pared, acabados seguros en melamina y validación de uso real con gatos.
                     </p>
                 </div>
 
-                <!-- Botón / Área interactiva para adjuntar fotos y videos del prototipo real -->
+                <!-- Botón opcional para probar archivos locales adicionales en vivo -->
                 <div>
-                    <label for="prototype-upload" class="cursor-pointer bg-white hover:bg-sage-50 text-sage-700 border-2 border-dashed border-sage-500 font-semibold px-5 py-3.5 rounded-2xl shadow-sm transition flex items-center gap-3 text-sm">
-                        <i class="fa-solid fa-cloud-arrow-up text-lg text-sage-600"></i>
-                        <div>
-                            <span class="block">Subir / Adjuntar Fotos y Videos</span>
-                            <span class="text-[11px] font-normal text-sand-800/70">Carga tus archivos reales desde tu dispositivo</span>
-                        </div>
+                    <label for="prototype-upload" class="cursor-pointer bg-white hover:bg-sage-50 text-sage-700 border border-sage-400 font-semibold px-4 py-3 rounded-2xl shadow-sm transition flex items-center gap-2.5 text-xs">
+                        <i class="fa-solid fa-plus text-sage-600"></i>
+                        <span>Probar carga local adicional</span>
                     </label>
                     <input type="file" id="prototype-upload" accept="image/*,video/*" multiple class="hidden">
                 </div>
             </div>
 
-            <!-- Contenedor de Archivos Subidos por los Emprendedores (Oculto hasta que suban archivos) -->
-            <div id="uploaded-media-wrapper" class="hidden mb-10">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-base text-sage-700 flex items-center gap-2">
-                        <i class="fa-solid fa-sparkles"></i>
-                        <span>Evidencia Real Cargada del Prototipo</span>
-                    </h3>
-                    <button type="button" id="clear-uploads-btn" class="text-xs text-terracotta-600 hover:underline font-medium">
-                        Limpiar archivos cargados
-                    </button>
+            <!-- VIDEO PRINCIPAL DEL PROTOTIPO REAL (assets/prototipo.mp4) -->
+            <div class="mb-10 bg-white p-4 sm:p-6 rounded-3xl border border-sand-200 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-xl bg-terracotta-500/15 text-terracotta-600 flex items-center justify-center">
+                            <i class="fa-solid fa-film"></i>
+                        </span>
+                        <div>
+                            <h3 class="font-bold text-base text-sand-900">Video Demostrativo del Prototipo en Funcionamiento</h3>
+                            <p class="text-xs text-sand-800/70">Prueba de estabilidad estructural e interacción felina en tiempo real</p>
+                        </div>
+                    </div>
+                    <span class="hidden sm:inline-block text-xs font-semibold bg-sage-100 text-sage-700 px-3 py-1 rounded-full">
+                        Prototipo Funcional Validado
+                    </span>
                 </div>
-                <div id="uploaded-media-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Aquí se inyectan dinámicamente las fotos y videos seleccionados -->
+
+                <div class="relative rounded-2xl overflow-hidden bg-sand-900 aspect-video max-h-[520px] flex items-center justify-center">
+                    <video id="prototype-main-video" controls playsinline preload="metadata" poster="assets/foto1.jpg" class="w-full h-full object-contain">
+                        <source src="assets/prototipo.mp4" type="video/mp4">
+                        Tu navegador no soporta la reproducción de video HTML5.
+                    </video>
+                    <!-- Aviso elegante si aún no se ha subido assets/prototipo.mp4 -->
+                    <div id="video-missing-fallback" class="hidden absolute inset-0 bg-sand-900/95 text-white flex flex-col items-center justify-center p-6 text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-white/10 text-sage-500 flex items-center justify-center mb-3 text-2xl">
+                            <i class="fa-solid fa-video"></i>
+                        </div>
+                        <h4 class="font-serif text-xl font-semibold">Video del Prototipo Listo para Vincular</h4>
+                        <p class="text-xs sm:text-sm text-sand-200 max-w-md mt-2">
+                            Guarda tu video dentro de la carpeta <code class="bg-white/15 px-2 py-0.5 rounded text-white">assets/</code> con el nombre exacto <code class="bg-white/15 px-2 py-0.5 rounded text-white">prototipo.mp4</code> y aparecerá automáticamente aquí.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Tarjetas de Ejemplo Iniciales del Prototipo -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="default-prototype-cards">
-                <!-- Tarjeta 1 -->
-                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col">
-                    <div class="aspect-[4/3] bg-sand-200/50 relative flex items-center justify-center p-6 overflow-hidden">
-                        <span class="absolute top-3 left-3 bg-sage-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                            Prueba de resistencia
+            <!-- CUADRÍCULA DE LAS 5 FOTOS OFICIALES DEL PROTOTIPO (assets/foto1.jpg a assets/foto5.jpg) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="official-prototype-photos">
+                
+                <!-- Foto 1 -->
+                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group">
+                    <div class="aspect-[4/3] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
+                        <span class="absolute top-3 left-3 z-10 bg-sage-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                            Foto 1 • Vista General
                         </span>
-                        <svg viewBox="0 0 240 160" class="w-44 h-auto">
-                            <rect x="30" y="95" width="180" height="22" rx="5" fill="#C9A27E" stroke="#A37C58" stroke-width="2"/>
-                            <!-- Anclajes invisibles ilustrados -->
-                            <line x1="65" y1="60" x2="65" y2="95" stroke="#53735F" stroke-width="2" stroke-dasharray="4 3"/>
-                            <line x1="175" y1="60" x2="175" y2="95" stroke="#53735F" stroke-width="2" stroke-dasharray="4 3"/>
-                            <circle cx="65" cy="60" r="6" fill="#53735F"/>
-                            <circle cx="175" cy="60" r="6" fill="#53735F"/>
-                            <text x="120" y="45" text-anchor="middle" font-size="11" font-weight="bold" fill="#3E5747">Soporta hasta 25 kg</text>
-                        </svg>
+                        <img src="assets/foto1.jpg" alt="Vista frontal del módulo en melamina" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto1.jpg')">
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
-                            <h4 class="font-bold text-sand-900">Anclajes Ocultos de Alto Impacto</h4>
+                            <h4 class="font-bold text-sand-900">Vista Frontal del Módulo en Melamina</h4>
                             <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
-                                Validación estructural con chazos expansivos y soportes metálicos internos que garantizan estabilidad total ante saltos bruscos.
+                                Integración arquitectónica limpia en pared aprovechando el espacio vertical sin invadir el área útil del piso.
                             </p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
-                            <span><i class="fa-solid fa-circle-check mr-1"></i> Validado en muro</span>
-                            <span>Espesor 18mm</span>
+                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
+                            <span>18 mm espesor</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tarjeta 2 -->
-                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col">
-                    <div class="aspect-[4/3] bg-sand-200/50 relative flex items-center justify-center p-6 overflow-hidden">
-                        <span class="absolute top-3 left-3 bg-sand-900 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                            Acabado en melamina
+                <!-- Foto 2 -->
+                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group">
+                    <div class="aspect-[4/3] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
+                        <span class="absolute top-3 left-3 z-10 bg-sand-900 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                            Foto 2 • Estructura
                         </span>
-                        <svg viewBox="0 0 240 160" class="w-44 h-auto">
-                            <rect x="45" y="40" width="150" height="85" rx="14" fill="#B58963" stroke="#8C6340" stroke-width="2.5"/>
-                            <rect x="53" y="48" width="134" height="69" rx="10" fill="none" stroke="#E6DEC8" stroke-width="1.5" stroke-dasharray="5 3"/>
-                            <text x="120" y="86" text-anchor="middle" font-size="11" font-weight="bold" fill="#FFFFFF">Tapacanto PVC Sellado</text>
-                        </svg>
+                        <img src="assets/foto2.jpg" alt="Detalle de anclajes ocultos y resistencia" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto2.jpg')">
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
-                            <h4 class="font-bold text-sand-900">Bordes Suaves y Limpieza Rápida</h4>
+                            <h4 class="font-bold text-sand-900">Detalle de Anclajes Ocultos y Resistencia</h4>
                             <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
-                                Tablero aglomerado melamínico sellado con tapacanto rígido redondeado: cero astillas, libre de tóxicos y fácil de limpiar con paño húmedo.
+                                Sistema de fijación interna de alta carga diseñado para soportar saltos dinámicos de hasta 25 kg con total firmeza.
                             </p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
-                            <span><i class="fa-solid fa-circle-check mr-1"></i> Pet-Safe Certificado</span>
-                            <span>Antirrayones</span>
+                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
+                            <span>Seguridad estructural</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tarjeta 3 -->
-                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col">
-                    <div class="aspect-[4/3] bg-sand-200/50 relative flex items-center justify-center p-6 overflow-hidden">
-                        <span class="absolute top-3 left-3 bg-terracotta-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                            Validación con gato real
+                <!-- Foto 3 -->
+                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group">
+                    <div class="aspect-[4/3] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
+                        <span class="absolute top-3 left-3 z-10 bg-sage-700 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                            Foto 3 • Acabados
                         </span>
-                        <svg viewBox="0 0 240 160" class="w-44 h-auto">
-                            <rect x="35" y="105" width="170" height="16" rx="4" fill="#C9A27E"/>
-                            <circle cx="120" cy="68" r="22" fill="#2E2922"/>
-                            <path d="M102 55 L105 36 L118 49 Z" fill="#2E2922"/>
-                            <path d="M122 49 L135 36 L138 55 Z" fill="#2E2922"/>
-                            <circle cx="113" cy="66" r="2.5" fill="#F8FAFC"/>
-                            <circle cx="127" cy="66" r="2.5" fill="#F8FAFC"/>
-                            <path d="M117 73 L120 76 L123 73" stroke="#E8C5B8" stroke-width="2" fill="none"/>
-                        </svg>
+                        <img src="assets/foto3.jpg" alt="Acabados y tapacantos seguros" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto3.jpg')">
                     </div>
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
-                            <h4 class="font-bold text-sand-900">Ergonomía y Distancias Etológicas</h4>
+                            <h4 class="font-bold text-sand-900">Acabados y Tapacantos Seguros</h4>
                             <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
-                                Separación calibrada entre peldaños (35-45 cm) y superficies antideslizantes en sisal para fomentar el ejercicio diario sin estrés.
+                                Bordes sellados con tapacanto rígido redondeado, libre de astillas y superficie melamínica lavable con paño húmedo.
                             </p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
-                            <span><i class="fa-solid fa-circle-check mr-1"></i> Aprobado por felinos</span>
-                            <span>Uso diario</span>
+                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
+                            <span>Pet-Safe</span>
                         </div>
                     </div>
                 </div>
+
+                <!-- Foto 4 -->
+                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group">
+                    <div class="aspect-[4/3] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
+                        <span class="absolute top-3 left-3 z-10 bg-terracotta-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                            Foto 4 • Uso Felino
+                        </span>
+                        <img src="assets/foto4.jpg" alt="Prueba de estabilidad y uso felino" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto4.jpg')">
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-sand-900">Prueba de Estabilidad y Uso Felino</h4>
+                            <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
+                                Validación conductual con gato real comprobando comodidad, agarre antideslizante y adopción inmediata del circuito.
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
+                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
+                            <span>Validado en casa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Foto 5 -->
+                <div class="bg-white rounded-3xl overflow-hidden border border-sand-200 shadow-sm flex flex-col group sm:col-span-2 lg:col-span-2">
+                    <div class="aspect-[16/9] sm:aspect-[21/9] bg-sand-200/50 relative overflow-hidden cursor-pointer photo-card-trigger">
+                        <span class="absolute top-3 left-3 z-10 bg-sage-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                            Foto 5 • Integración Estética
+                        </span>
+                        <img src="assets/foto5.jpg" alt="Integración estética en pared" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleMissingPhoto(this, 'assets/foto5.jpg')">
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-sand-900">Integración Estética en Pared del Hogar</h4>
+                            <p class="text-xs text-sand-800/80 mt-1.5 leading-relaxed">
+                                Armonía visual completa entre mobiliario contemporáneo y enriquecimiento ambiental felino: protege los muebles del hogar mientras embellece el espacio.
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-sand-100 flex items-center justify-between text-xs text-sage-700 font-medium">
+                            <span><i class="fa-solid fa-expand mr-1"></i> Clic para ampliar</span>
+                            <span>Diseño Llave en Mano</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor de Archivos Extra Subidos Manualmente (Opcional) -->
+            <div id="uploaded-media-wrapper" class="hidden mt-10 pt-8 border-t border-sand-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-base text-sage-700 flex items-center gap-2">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span>Archivos Adicionales Cargados en Vivo</span>
+                    </h3>
+                    <button type="button" id="clear-uploads-btn" class="text-xs text-terracotta-600 hover:underline font-medium">
+                        Limpiar archivos adicionales
+                    </button>
+                </div>
+                <div id="uploaded-media-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
         </div>
     </section>
@@ -785,7 +820,7 @@
                             <div>
                                 <span class="text-xs text-sand-800/70 block">WhatsApp Business (Cotizaciones)</span>
                                 <a href="https://wa.me/573000000000?text=Hola%20H%C3%A1biCat,%20quiero%20cotizar%20un%20h%C3%A1bitat%20para%20mi%20gato" target="_blank" class="font-semibold text-sm hover:text-sage-600 transition">
-                                    +57 (300) 123-4567
+                                    +57 300 000 0000
                                 </a>
                             </div>
                         </div>
@@ -877,11 +912,37 @@
 
     <!-- ==================== LÓGICA INTERACTIVA JAVASCRIPT ==================== -->
     <script>
+        // Manejador global para fotos faltantes en assets/
+        function handleMissingPhoto(imgEl, expectedPath) {
+            const container = imgEl.parentElement;
+            imgEl.style.display = 'none';
+            container.classList.remove('cursor-pointer', 'photo-card-trigger');
+            const placeholder = document.createElement('div');
+            placeholder.className = 'w-full h-full flex flex-col items-center justify-center p-6 text-center bg-sand-100 text-sand-800';
+            placeholder.innerHTML = `
+                <i class="fa-regular fa-image text-3xl text-sage-600 mb-2"></i>
+                <p class="text-xs font-semibold">Espacio reservado para imagen</p>
+                <code class="text-[11px] bg-white px-2 py-1 rounded border border-sand-200 mt-1.5 text-sage-700">${expectedPath}</code>
+            `;
+            container.appendChild(placeholder);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Verificar si el video assets/prototipo.mp4 existe o mostrar guía elegante
+            const mainVideo = document.getElementById('prototype-main-video');
+            const videoFallback = document.getElementById('video-missing-fallback');
+            if (mainVideo) {
+                const sourceEl = mainVideo.querySelector('source');
+                sourceEl.addEventListener('error', () => {
+                    videoFallback.classList.remove('hidden');
+                });
+            }
+
             // Estado central de la configuración del usuario
             const state = {
                 plan: 'intermedio',
                 planName: 'HábiCat Intermedio',
+                basePrice: 550000,
                 dimensions: '2.20m ancho x 1.80m alto',
                 addons: {
                     hamaca: false,
@@ -892,47 +953,79 @@
                     comedero: false
                 },
                 melamine: {
-                    name: 'Roble Natural',
+                    name: 'Roble Nórdico',
                     fill: '#C9A27E',
                     stroke: '#A37C58'
                 },
                 wall: {
-                    name: 'Beige Cálido',
-                    color: '#F5F0E6'
+                    name: 'Arena Cálido',
+                    color: '#F3EAD8'
                 }
             };
 
-            // Diccionario de nombres legibles de accesorios
+            // Diccionario de nombres legibles y precios adicionales de accesorios (COP)
             const addonLabels = {
-                hamaca: 'Hamaca flotante suave',
+                hamaca: 'Hamaca aérea acolchada',
                 escaleritas: 'Escaleritas de pared (3 peldaños)',
-                puente: 'Puente colgante de sisal',
-                casa: 'Casa / Cubo refugio aéreo',
-                rascador: 'Poste rascador vertical',
-                comedero: 'Comedero elevado en altura'
+                puente: 'Puente colgante en soga y melamina',
+                casa: 'Cubo / Refugio mirador con ventana',
+                rascador: 'Rascador vertical integrado en sisal',
+                comedero: 'Repisa panorámica de descanso extra'
             };
 
-            // Configuraciones predefinidas por nivel
+            const addonPrices = {
+                hamaca: 65000,
+                escaleritas: 55000,
+                puente: 95000,
+                casa: 120000,
+                rascador: 70000,
+                comedero: 50000
+            };
+
+            // Configuraciones predefinidas por nivel con sus precios base en COP
             const planPresets = {
                 sencillo: {
                     name: 'HábiCat Sencillo',
+                    basePrice: 380000,
                     dimensions: '1.50m ancho x 1.50m alto',
-                    addons: { hamaca: false, escaleritas: false, puente: false, casa: false, rascador: false, comedero: false },
-                    showExtraShelves: false
+                    addons: { hamaca: false, escaleritas: false, puente: false, casa: false, rascador: false, comedero: false }
                 },
                 intermedio: {
                     name: 'HábiCat Intermedio',
+                    basePrice: 550000,
                     dimensions: '2.20m ancho x 1.80m alto',
-                    addons: { hamaca: false, escaleritas: false, puente: true, casa: false, rascador: true, comedero: false },
-                    showExtraShelves: true
+                    addons: { hamaca: false, escaleritas: false, puente: true, casa: false, rascador: true, comedero: false }
                 },
                 super: {
                     name: 'Súper HábiCat',
+                    basePrice: 820000,
                     dimensions: '3.00m ancho x 2.10m alto',
-                    addons: { hamaca: true, escaleritas: false, puente: true, casa: true, rascador: true, comedero: false },
-                    showExtraShelves: true
+                    addons: { hamaca: true, escaleritas: false, puente: true, casa: true, rascador: true, comedero: false }
                 }
             };
+
+            // Formateador de moneda colombiana
+            function formatCOP(amount) {
+                return '$' + amount.toLocaleString('es-CO') + ' COP';
+            }
+
+            // Calcula el precio dinámico sumando extras respecto a los incluidos por defecto en el plan
+            function calculateTotalPrice() {
+                const preset = planPresets[state.plan];
+                let total = preset.basePrice;
+
+                Object.keys(state.addons).forEach(key => {
+                    const isChecked = state.addons[key];
+                    const wasIncludedInPreset = preset.addons[key];
+                    if (isChecked && !wasIncludedInPreset) {
+                        total += addonPrices[key];
+                    } else if (!isChecked && wasIncludedInPreset) {
+                        total -= Math.round(addonPrices[key] * 0.6);
+                    }
+                });
+
+                return Math.max(total, 320000);
+            }
 
             // Referencias DOM
             const planRadios = document.querySelectorAll('input[name="habicat_plan"]');
@@ -943,7 +1036,7 @@
             const customWallPicker = document.getElementById('custom-wall-picker');
             const wallCanvas = document.getElementById('wall-canvas');
 
-            // Función principal que actualiza el render SVG y los textos de resumen
+            // Función principal que actualiza el render SVG, precio y textos de resumen
             function updateVisualizer() {
                 // 1. Actualizar color de fondo de pared
                 wallCanvas.style.backgroundColor = state.wall.color;
@@ -977,10 +1070,15 @@
                     }
                 });
 
-                // 5. Actualizar textos de resumen y dimensiones
+                // 5. Calcular precios y actualizar resumen
+                const totalPrice = calculateTotalPrice();
+                const halfPrice = Math.round(totalPrice / 2);
+
                 document.getElementById('wall-dimensions').textContent = state.dimensions;
                 document.getElementById('badge-plan-title').textContent = `${state.planName} • ${state.melamine.name}`;
-                document.getElementById('summary-title').textContent = state.planName;
+                document.getElementById('summary-price').textContent = formatCOP(totalPrice);
+                document.getElementById('summary-payment-scheme').textContent = 
+                    `Esquema flexible: 50% anticipo ($${halfPrice.toLocaleString('es-CO')}) • 50% contra entrega ($${halfPrice.toLocaleString('es-CO')})`;
 
                 const activeAddonsList = Object.keys(state.addons)
                     .filter(k => state.addons[k])
@@ -995,7 +1093,7 @@
                     : '';
 
                 document.getElementById('summary-details').textContent = 
-                    `Incluye: ${baseText}${addonsSummary}. Acabado en melamina ${state.melamine.name}.`;
+                    `Incluye: ${baseText}${addonsSummary}. Melamina ${state.melamine.name}.`;
             }
 
             // Eventos de cambio de Plan / Nivel
@@ -1006,6 +1104,7 @@
                     
                     state.plan = selected;
                     state.planName = preset.name;
+                    state.basePrice = preset.basePrice;
                     state.dimensions = preset.dimensions;
                     state.addons = { ...preset.addons };
 
@@ -1092,6 +1191,8 @@
             const copyQuoteBtn = document.getElementById('copy-quote-btn');
 
             function getPlainSummaryText() {
+                const totalPrice = calculateTotalPrice();
+                const halfPrice = Math.round(totalPrice / 2);
                 const activeAddons = Object.keys(state.addons)
                     .filter(k => state.addons[k])
                     .map(k => `• ${addonLabels[k]}`)
@@ -1099,6 +1200,7 @@
 
                 return `¡Hola HábiCat! Me gustaría cotizar mi hábitat personalizado:\n\n` +
                        `*Nivel elegido:* ${state.planName}\n` +
+                       `*Inversión estimada:* ${formatCOP(totalPrice)} (50% anticipo: $${halfPrice.toLocaleString('es-CO')})\n` +
                        `*Melamina:* ${state.melamine.name}\n` +
                        `*Color de pared de referencia:* ${state.wall.name} (${state.wall.color})\n` +
                        `*Espacio estimado:* ${state.dimensions}\n` +
@@ -1106,12 +1208,16 @@
             }
 
             openQuoteBtn.addEventListener('click', () => {
+                const totalPrice = calculateTotalPrice();
+                const halfPrice = Math.round(totalPrice / 2);
                 const activeAddons = Object.keys(state.addons)
                     .filter(k => state.addons[k])
                     .map(k => addonLabels[k]);
 
                 modalSummaryBox.innerHTML = `
                     <div class="flex justify-between"><span class="text-sand-800/70">Plan seleccionado:</span> <strong>${state.planName}</strong></div>
+                    <div class="flex justify-between"><span class="text-sand-800/70">Valor estimado:</span> <strong class="text-sage-700">${formatCOP(totalPrice)}</strong></div>
+                    <div class="flex justify-between text-xs"><span class="text-sand-800/70">Forma de pago:</span> <span>50% anticipo ($${halfPrice.toLocaleString('es-CO')}) / 50% entrega</span></div>
                     <div class="flex justify-between"><span class="text-sand-800/70">Tablero melamina:</span> <strong>${state.melamine.name}</strong></div>
                     <div class="flex justify-between items-center"><span class="text-sand-800/70">Pared simulada:</span> 
                         <span class="flex items-center gap-1.5 font-semibold">
@@ -1158,6 +1264,17 @@
             const lightboxModal = document.getElementById('lightbox-modal');
             const lightboxImg = document.getElementById('lightbox-img');
             const closeLightbox = document.getElementById('close-lightbox');
+
+            // Activar Lightbox en las 5 fotos oficiales del prototipo
+            document.querySelectorAll('#official-prototype-photos .photo-card-trigger').forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const img = trigger.querySelector('img');
+                    if (img && img.style.display !== 'none') {
+                        lightboxImg.src = img.src;
+                        lightboxModal.classList.remove('hidden');
+                    }
+                });
+            });
 
             uploadInput.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
